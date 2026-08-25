@@ -49,14 +49,14 @@ describe('auditoria semântica do banco de questões', () => {
 
   it('mantém tarefas N1 com operações diferentes dentro de Leitura', () => {
     const prompts = CONTENT['leitura-N1'].items.map(item => normalize(item.prompt));
-    expect(prompts.some(prompt => prompt.includes('uma silaba'))).toBe(true);
-    expect(prompts.some(prompt => prompt.includes('junte as silabas'))).toBe(true);
-    expect(prompts.some(prompt => prompt.includes('tres silabas'))).toBe(true);
-    expect(CONTENT['leitura-N1'].material).toContain('SOL = 1 sílaba');
-    expect(CONTENT['leitura-N1'].material).toContain('BO-TA = 2 sílabas');
-    expect(CONTENT['leitura-N1'].material).toContain('EN-TRA-DA = 3 sílabas');
+    expect(prompts.some(prompt => prompt.includes('somente vogais'))).toBe(true);
+    expect(prompts.some(prompt => prompt.includes('depois de m'))).toBe(true);
+    expect(prompts.some(prompt => prompt.includes('letra inicial'))).toBe(true);
+    expect(CONTENT['leitura-N1'].material).toContain('Alfabeto completo');
+    expect(CONTENT['leitura-N1'].material).toContain('Vogais: A, E, I, O, U');
+    expect(CONTENT['leitura-N1'].material).toContain('Primeiro reconhecemos letras');
     expect(CONTENT['leitura-N1'].items[1].kind).toBe('short-text');
-    expect(CONTENT['leitura-N1'].items[1].answer).toBe('BOTA');
+    expect(CONTENT['leitura-N1'].items[1].answer).toBe('N');
     expect(CONTENT['leitura-N2'].material).toContain('FERRAMENTA = fer-ra-men-ta (4 sílabas)');
     expect(CONTENT['leitura-N3'].material).toContain('ORGANIZAÇÃO = or-ga-ni-za-ção (5 sílabas)');
   });
