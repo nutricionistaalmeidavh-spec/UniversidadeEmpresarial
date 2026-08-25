@@ -27,6 +27,8 @@ As três competências de Comunicação no N1 tinham uma concentração excessiv
 - Compreensão N1: localizar ação, horário e pessoa em frases curtas.
 - Escrita N1: registrar nome, setor e confirmação funcional.
 
+Leitura N1 também foi conferida quanto à quantidade silábica: há uma atividade com palavra de 1 sílaba (`SOL`), uma com 2 (`BO-TA`) e uma com 3 (`EN-TRA-DA`). Essa regra está protegida por teste automatizado.
+
 Também foi alterado um par de Multiplicação N5 que perguntava, em sequência, o total da Equipe A e o total da Equipe B. O segundo item agora confere o cálculo de uma produção já registrada, mudando a operação cognitiva sem mudar a dificuldade.
 
 ## Como a sondagem inicial funciona

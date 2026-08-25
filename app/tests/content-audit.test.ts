@@ -47,8 +47,11 @@ describe('auditoria semântica do banco de questões', () => {
 
   it('mantém tarefas N1 com operações diferentes dentro de Leitura', () => {
     const prompts = CONTENT['leitura-N1'].items.map(item => normalize(item.prompt));
-    expect(prompts.some(prompt => prompt.includes('primeira letra'))).toBe(true);
-    expect(prompts.some(prompt => prompt.includes('comeca com'))).toBe(true);
-    expect(prompts.some(prompt => prompt.includes('placa'))).toBe(true);
+    expect(prompts.some(prompt => prompt.includes('uma silaba'))).toBe(true);
+    expect(prompts.some(prompt => prompt.includes('duas silabas'))).toBe(true);
+    expect(prompts.some(prompt => prompt.includes('tres silabas'))).toBe(true);
+    expect(CONTENT['leitura-N1'].material).toContain('SOL = 1 sílaba');
+    expect(CONTENT['leitura-N1'].material).toContain('BO-TA = 2 sílabas');
+    expect(CONTENT['leitura-N1'].material).toContain('EN-TRA-DA = 3 sílabas');
   });
 });
