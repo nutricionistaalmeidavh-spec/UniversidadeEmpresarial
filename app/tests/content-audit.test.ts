@@ -32,7 +32,7 @@ describe('auditoria semântica do banco de questões', () => {
   it('não repete enunciados nem alternativas corretas entre as unidades', () => {
     const prompts = rows.map(row => normalize(row.item.prompt));
     expect(new Set(prompts).size).toBe(prompts.length);
-    expect(rows.every(({ item }) => item.kind === 'text' || item.options?.includes(item.answer))).toBe(true);
+    expect(rows.every(({ item }) => item.kind === 'text' || item.kind === 'short-text' || item.options?.includes(item.answer))).toBe(true);
   });
 
   it('não mantém pares de enunciados excessivamente semelhantes', () => {
@@ -50,11 +50,13 @@ describe('auditoria semântica do banco de questões', () => {
   it('mantém tarefas N1 com operações diferentes dentro de Leitura', () => {
     const prompts = CONTENT['leitura-N1'].items.map(item => normalize(item.prompt));
     expect(prompts.some(prompt => prompt.includes('uma silaba'))).toBe(true);
-    expect(prompts.some(prompt => prompt.includes('duas silabas'))).toBe(true);
+    expect(prompts.some(prompt => prompt.includes('junte as silabas'))).toBe(true);
     expect(prompts.some(prompt => prompt.includes('tres silabas'))).toBe(true);
     expect(CONTENT['leitura-N1'].material).toContain('SOL = 1 sílaba');
     expect(CONTENT['leitura-N1'].material).toContain('BO-TA = 2 sílabas');
     expect(CONTENT['leitura-N1'].material).toContain('EN-TRA-DA = 3 sílabas');
+    expect(CONTENT['leitura-N1'].items[1].kind).toBe('short-text');
+    expect(CONTENT['leitura-N1'].items[1].answer).toBe('BOTA');
     expect(CONTENT['leitura-N2'].material).toContain('FERRAMENTA = fer-ra-men-ta (4 sílabas)');
     expect(CONTENT['leitura-N3'].material).toContain('ORGANIZAÇÃO = or-ga-ni-za-ção (5 sílabas)');
   });
