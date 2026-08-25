@@ -3,3 +3,5 @@ __pycache__/
 preview-*.png
 dom-mobile.txt
 trilha-lideranca-organizacao.html
+app/node_modules/
+app/dist/

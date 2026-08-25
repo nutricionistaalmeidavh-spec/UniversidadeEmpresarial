@@ -4,7 +4,8 @@ export default defineConfig({
     base: './',
     build: {
         rollupOptions: {
-            input: ['index.html','gestao.html','obra.html','universidade.html'],
+            input: ['universidade.html'],
+            external: ['@appdeploy/client'],
             maxParallelFileOps: 128,
         },
     },
