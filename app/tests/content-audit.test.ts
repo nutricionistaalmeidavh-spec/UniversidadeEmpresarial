@@ -32,7 +32,7 @@ describe('auditoria semântica do banco de questões', () => {
   it('não repete enunciados nem alternativas corretas entre as unidades', () => {
     const prompts = rows.map(row => normalize(row.item.prompt));
     expect(new Set(prompts).size).toBe(prompts.length);
-    expect(rows.every(({ item }) => item.kind === 'text' || item.kind === 'short-text' || item.options?.includes(item.answer))).toBe(true);
+    expect(rows.every(({ item }) => item.kind === 'choice' || item.kind === 'text' || item.kind === 'short-text' || item.options?.includes(item.answer))).toBe(true);
   });
 
   it('não mantém pares de enunciados excessivamente semelhantes', () => {
@@ -64,7 +64,7 @@ describe('auditoria semântica do banco de questões', () => {
   it('incorpora banco adicional de Português sem alterar a quantidade por unidade', () => {
     const variants = Object.values(QUESTION_BANK).flat();
     expect(variants.length).toBeGreaterThan(0);
-    expect(variants.every(item => (item.kind === 'text' || item.kind === 'short-text') && item.visual?.src)).toBe(true);
+    expect(variants.every(item => (item.kind === 'choice' || item.kind === 'text' || item.kind === 'short-text') && item.visual?.src)).toBe(true);
     expect(Object.entries(CONTENT).every(([id, unit]) => selectQuestions(id, unit.items, 42).length === 3)).toBe(true);
     expect(SUPPORT_MATERIALS.matematica.length).toBeGreaterThan(100);
     expect(SUPPORT_MATERIALS.portugues.length).toBeGreaterThan(100);
