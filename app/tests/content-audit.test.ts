@@ -53,5 +53,7 @@ describe('auditoria semântica do banco de questões', () => {
     expect(CONTENT['leitura-N1'].material).toContain('SOL = 1 sílaba');
     expect(CONTENT['leitura-N1'].material).toContain('BO-TA = 2 sílabas');
     expect(CONTENT['leitura-N1'].material).toContain('EN-TRA-DA = 3 sílabas');
+    expect(CONTENT['leitura-N2'].material).toContain('FERRAMENTA = fer-ra-men-ta (4 sílabas)');
+    expect(CONTENT['leitura-N3'].material).toContain('ORGANIZAÇÃO = or-ga-ni-za-ção (5 sílabas)');
   });
 });

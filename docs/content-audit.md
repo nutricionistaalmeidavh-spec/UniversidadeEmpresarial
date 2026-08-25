@@ -29,6 +29,8 @@ As três competências de Comunicação no N1 tinham uma concentração excessiv
 
 Leitura N1 também foi conferida quanto à quantidade silábica: há uma atividade com palavra de 1 sílaba (`SOL`), uma com 2 (`BO-TA`) e uma com 3 (`EN-TRA-DA`). Essa regra está protegida por teste automatizado.
 
+Nos níveis seguintes, a progressão inclui exposição explícita a palavras mais longas: `FERRAMENTA` com 4 sílabas em N2 e `ORGANIZAÇÃO` com 5 sílabas em N3. Isso mantém N1 acessível e amplia gradualmente a complexidade.
+
 Também foi alterado um par de Multiplicação N5 que perguntava, em sequência, o total da Equipe A e o total da Equipe B. O segundo item agora confere o cálculo de uma produção já registrada, mudando a operação cognitiva sem mudar a dificuldade.
 
 ## Como a sondagem inicial funciona
