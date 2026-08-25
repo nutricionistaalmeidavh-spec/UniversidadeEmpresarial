@@ -13,6 +13,10 @@ Auditoria executada sobre o snapshot v80 (`1787686999001`) após a revisão de v
 - Todas as atividades de escolha têm a resposta correta entre as alternativas.
 - Todas as atividades têm enunciado e dica de correção.
 
+## Limite identificado e correção
+
+O primeiro relatório usava apenas similaridade lexical Jaccard com limite de 0,75. Esse teste detecta duplicação quase literal, mas pode deixar passar duas perguntas com o mesmo molde e palavras centrais compartilhadas. Por isso, a revisão manual também verifica a forma da tarefa, o verbo de ação e a habilidade mobilizada. Em Leitura N1, por exemplo, a pergunta que localizava a palavra da placa foi trocada por uma tarefa de identificação da letra inicial de `ENTRADA`, preservando o nível e mudando a operação cognitiva.
+
 A auditoria está automatizada em `app/tests/content-audit.test.ts`; qualquer nova questão que viole esses limites falha no teste.
 
 ## Ajustes de variedade realizados

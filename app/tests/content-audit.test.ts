@@ -44,4 +44,11 @@ describe('auditoria semântica do banco de questões', () => {
     }
     expect(similar).toEqual([]);
   });
+
+  it('mantém tarefas N1 com operações diferentes dentro de Leitura', () => {
+    const prompts = CONTENT['leitura-N1'].items.map(item => normalize(item.prompt));
+    expect(prompts.some(prompt => prompt.includes('primeira letra'))).toBe(true);
+    expect(prompts.some(prompt => prompt.includes('comeca com'))).toBe(true);
+    expect(prompts.some(prompt => prompt.includes('placa'))).toBe(true);
+  });
 });
