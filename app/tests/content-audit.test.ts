@@ -25,6 +25,7 @@ describe('auditoria semântica do banco de questões', () => {
     expect(Object.keys(CONTENT)).toHaveLength(60);
     expect(rows).toHaveLength(180);
     expect(rows.every(row => row.item.prompt.trim() && row.item.hint.trim())).toBe(true);
+    expect(rows.every(row => row.item.visual?.src && row.item.visual?.alt)).toBe(true);
   });
 
   it('não repete enunciados nem alternativas corretas entre as unidades', () => {

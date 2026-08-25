@@ -12,6 +12,7 @@ Auditoria executada sobre o snapshot v80 (`1787686999001`) após a revisão de v
 - 0 pares com similaridade lexical Jaccard igual ou superior a 0,75.
 - Todas as atividades de escolha têm a resposta correta entre as alternativas.
 - Todas as atividades têm enunciado e dica de correção.
+- Todas as 180 atividades têm contexto visual acessível, com imagem inline e texto alternativo; a imagem varia por competência, nível e posição da atividade.
 
 ## Limite identificado e correção
 
