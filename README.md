@@ -1,30 +1,17 @@
 # Universidade Empresarial
 
-Trilha interna de capacitação para líderes, encarregados e equipes de uma
-empresa de hidráulica e alvenaria.
+Repositório sincronizado com a versão canônica AppDeploy v80 da Universidade Empresarial.
 
-## Treinamentos
+- AppDeploy: `fluxodre-campo-b2u-clbfo5`
+- Snapshot: `1787686999001`
+- URL: https://fluxodre-campo-b2u-clbfo5.v2.appdeploy.ai/
 
-1. WhatsApp profissional
-2. Planejamento diário
-3. Checklists que funcionam
-4. Registro fotográfico
-5. Liderança e cobrança
-6. Passagem de serviço
-7. Produtividade e não conformidades
+## Estrutura
 
-## Como usar
+- `app/`: código atual da Universidade, incluindo 3 áreas, 12 competências, níveis N1–N5, sondagem adaptativa, tarefas, revisão espaçada, progresso, RBAC e Administração RH.
+- `training/legacy-lideranca/`: cópia preservada do treinamento antigo de liderança e organização na obra.
+- `APPDEPLOY_SYNC.md`: instruções e registro de sincronização.
 
-Abra `index.html` em um navegador. O treinamento funciona sem servidor,
-salva o progresso no próprio navegador e pode ser impresso ou exportado para
-PDF.
+O `index.html` encaminha para a aplicação AppDeploy, pois o runtime atual usa autenticação e backend próprios; o código versionado do módulo fica em `app/`.
 
-O arquivo `Treinamento - Chumbamento de Passantes.pptx` contém o treinamento
-técnico complementar. Para recriá-lo, instale as dependências e execute:
-
-```powershell
-python -m pip install -r requirements.txt
-python gerar_treinamento_chumbamento.py
-```
-
-As fotografias utilizadas estão em `assets-treinamento/`.
+As atividades são autorais e usam os materiais pedagógicos recebidos como referência, sem reprodução literal.
