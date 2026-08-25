@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { CONTENT, QUESTION_BANK, selectQuestions } from '../src/curriculum';
+import { SUPPORT_MATERIALS } from '../src/support-materials';
 
 const normalize = (value: string) => value
   .toLowerCase()
@@ -63,5 +64,7 @@ describe('auditoria semântica do banco de questões', () => {
     expect(variants.length).toBeGreaterThan(0);
     expect(variants.every(item => item.kind === 'text' && item.answer === '' && item.visual?.src)).toBe(true);
     expect(Object.entries(CONTENT).every(([id, unit]) => selectQuestions(id, unit.items, 42).length === 3)).toBe(true);
+    expect(SUPPORT_MATERIALS.matematica.length).toBeGreaterThan(100);
+    expect(SUPPORT_MATERIALS.portugues.length).toBeGreaterThan(100);
   });
 });

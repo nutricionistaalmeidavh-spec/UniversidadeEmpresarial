@@ -14,8 +14,10 @@ Auditoria executada sobre o snapshot v80 (`1787686999001`) após a revisão de v
 - Todas as atividades têm enunciado e dica de correção.
 - Todas as 180 atividades têm contexto visual acessível, com imagem inline e texto alternativo; a imagem varia por competência, nível e posição da atividade.
 - A lista de Português do Ensino Médio foi incorporada como 98 variantes abertas, distribuídas por Leitura, Compreensão e Escrita nos níveis N2–N4.
+- Os novos bancos de Matemática Kumon, Matemática EF e Português de Alfabetização acrescentaram 131 variantes abertas, mantendo a quantidade de 3 questões por unidade.
 - A seleção de uma unidade continua retornando exatamente 3 questões; a função `selectQuestions` alterna entre o conteúdo-base e as variantes compatíveis com competência e nível.
 - As variantes abertas permanecem abertas e são avaliadas por resposta mínima para permitir correção posterior pelo responsável.
+- Os materiais de apoio de Matemática EF e Português EM aparecem antes das questões em um painel rolável; N1 de Leitura usa o apoio de alfabetização.
 
 ## Limite identificado e correção
 
