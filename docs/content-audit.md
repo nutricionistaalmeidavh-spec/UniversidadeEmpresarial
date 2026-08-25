@@ -13,6 +13,9 @@ Auditoria executada sobre o snapshot v80 (`1787686999001`) após a revisão de v
 - Todas as atividades de escolha têm a resposta correta entre as alternativas.
 - Todas as atividades têm enunciado e dica de correção.
 - Todas as 180 atividades têm contexto visual acessível, com imagem inline e texto alternativo; a imagem varia por competência, nível e posição da atividade.
+- A lista de Português do Ensino Médio foi incorporada como 98 variantes abertas, distribuídas por Leitura, Compreensão e Escrita nos níveis N2–N4.
+- A seleção de uma unidade continua retornando exatamente 3 questões; a função `selectQuestions` alterna entre o conteúdo-base e as variantes compatíveis com competência e nível.
+- As variantes abertas permanecem abertas e são avaliadas por resposta mínima para permitir correção posterior pelo responsável.
 
 ## Limite identificado e correção
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { CONTENT } from '../src/curriculum';
+import { CONTENT, QUESTION_BANK, selectQuestions } from '../src/curriculum';
 
 const normalize = (value: string) => value
   .toLowerCase()
@@ -56,5 +56,12 @@ describe('auditoria semântica do banco de questões', () => {
     expect(CONTENT['leitura-N1'].material).toContain('EN-TRA-DA = 3 sílabas');
     expect(CONTENT['leitura-N2'].material).toContain('FERRAMENTA = fer-ra-men-ta (4 sílabas)');
     expect(CONTENT['leitura-N3'].material).toContain('ORGANIZAÇÃO = or-ga-ni-za-ção (5 sílabas)');
+  });
+
+  it('incorpora banco adicional de Português sem alterar a quantidade por unidade', () => {
+    const variants = Object.values(QUESTION_BANK).flat();
+    expect(variants.length).toBeGreaterThan(0);
+    expect(variants.every(item => item.kind === 'text' && item.answer === '' && item.visual?.src)).toBe(true);
+    expect(Object.entries(CONTENT).every(([id, unit]) => selectQuestions(id, unit.items, 42).length === 3)).toBe(true);
   });
 });
