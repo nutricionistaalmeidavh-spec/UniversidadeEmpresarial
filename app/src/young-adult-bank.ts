@@ -331,7 +331,7 @@ const RAW:YoungAdultVariant[]=[
     "skill": "compreensao",
     "level": "N2",
     "topic": "PORTUGUÊS",
-    "prompt": "Qual é o assunto principal do texto?",
+    "prompt": "Qual mensagem central aparece no aviso sobre os galhos?",
     "answer": "b",
     "kind": "choice",
     "options": [
@@ -557,7 +557,7 @@ const RAW:YoungAdultVariant[]=[
     "skill": "compreensao",
     "level": "N3",
     "topic": "PORTUGUÊS",
-    "prompt": "Qual é o assunto principal do texto?",
+    "prompt": "Qual ideia principal aparece no relato sobre os galhos?",
     "answer": "A retirada/organização de galhos após uma chuva forte",
     "kind": "short-text",
     "options": [],
@@ -1061,7 +1061,7 @@ const RAW:YoungAdultVariant[]=[
     "skill": "escrita",
     "level": "N4",
     "topic": "PORTUGUÊS",
-    "prompt": "Qual forma está correta?",
+    "prompt": "Escolha a grafia adequada para completar a frase.",
     "answer": "b",
     "kind": "choice",
     "options": [
@@ -1077,7 +1077,7 @@ const RAW:YoungAdultVariant[]=[
     "skill": "escrita",
     "level": "N4",
     "topic": "PORTUGUÊS",
-    "prompt": "Qual forma está correta?",
+    "prompt": "Qual grafia completa corretamente a frase apresentada?",
     "answer": "a",
     "kind": "choice",
     "options": [

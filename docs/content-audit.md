@@ -1,58 +1,47 @@
 # Auditoria do banco de questões
 
-Auditoria executada sobre o snapshot v80 (`1787686999001`) após a revisão de variação.
+Auditoria automatizada do currículo da Universidade Empresarial. O código versionado no GitHub é a fonte de verdade; o AppDeploy é o runtime operacional e recebe os mesmos arquivos após a validação.
 
-## Resultado
+## Cobertura atual
 
-- 12 competências.
-- 5 níveis por competência.
-- 60 unidades.
-- 180 atividades (3 por unidade).
-- 0 enunciados repetidos após normalização de acentos, pontuação e prefixos de competência.
-- 0 pares com similaridade lexical Jaccard igual ou superior a 0,75.
-- Todas as atividades de escolha têm a resposta correta entre as alternativas.
-- Todas as atividades têm enunciado e dica de correção.
-- Todas as 180 atividades têm contexto visual acessível, com imagem inline e texto alternativo; a imagem varia por competência, nível e posição da atividade.
-- A lista de Português do Ensino Médio foi incorporada como 98 variantes abertas, distribuídas por Leitura, Compreensão e Escrita nos níveis N2–N4.
-- Os novos bancos de Matemática Kumon, Matemática EF e Português de Alfabetização acrescentaram 131 variantes abertas, mantendo a quantidade de 3 questões por unidade.
-- A seleção de uma unidade continua retornando exatamente 3 questões; a função `selectQuestions` alterna entre o conteúdo-base e as variantes compatíveis com competência e nível.
-- As variantes abertas permanecem abertas e são avaliadas por resposta mínima para permitir correção posterior pelo responsável.
-- Os materiais de apoio de Matemática EF e Português EM aparecem antes das questões em um painel rolável; N1 de Leitura usa o apoio de alfabetização.
+- 12 competências, 5 níveis (N1–N5) e 60 unidades.
+- 180 itens-base (3 atividades por unidade).
+- 429 variantes: 131 em `additional-bank`, 98 em `portuguese-bank` e 200 em `young-adult-bank`.
+- 609 itens auditados no total (base + variantes).
+- Cada unidade continua selecionando exatamente 3 questões; a seleção mistura base e variantes compatíveis com competência e nível.
 
-## Limite identificado e correção
+## Regras verificadas automaticamente
 
-O primeiro relatório usava apenas similaridade lexical Jaccard com limite de 0,75. Esse teste detecta duplicação quase literal, mas pode deixar passar duas perguntas com o mesmo molde e palavras centrais compartilhadas. Por isso, a revisão manual também verifica a forma da tarefa, o verbo de ação e a habilidade mobilizada. Em Leitura N1, por exemplo, a pergunta que localizava a palavra da placa foi trocada por uma tarefa de identificação da letra inicial de `ENTRADA`, preservando o nível e mudando a operação cognitiva.
+O teste `app/tests/content-audit.test.ts` verifica todos os bancos, não apenas os 180 itens-base:
 
-A auditoria está automatizada em `app/tests/content-audit.test.ts`; qualquer nova questão que viole esses limites falha no teste.
+- enunciado e dica não vazios;
+- competência válida e nível N1–N5 compatível com a unidade;
+- tipo válido (`choice`, `short-text` ou `text`);
+- alternativas e gabarito coerentes;
+- respostas curtas com resposta esperada;
+- respostas abertas preservadas como texto para revisão humana;
+- imagem gerada para cada item exibido, sempre com texto alternativo;
+- ausência de duplicidade exata após normalização;
+- similaridade lexical Jaccard ≥ 0,75 reportada para revisão, sem apagar automaticamente o conteúdo;
+- limite de três questões selecionadas por unidade.
 
-## Ajustes de variedade realizados
+Na última execução não houve duplicidade exata. Foram sinalizados três pares lexicalmente próximos para revisão editorial futura; eles não são cópias literais e mantêm objetivos distintos.
 
-As três competências de Comunicação no N1 tinham uma concentração excessiva em juntar sílabas (Leitura, Compreensão e Escrita). Elas foram separadas por habilidade:
+## Respostas e progressão
 
-- Leitura N1: localizar palavras em placas e etiquetas.
-- Compreensão N1: localizar ação, horário e pessoa em frases curtas.
-- Escrita N1: registrar nome, setor e confirmação funcional.
+Variantes importadas que usam letras (`a`, `b`, `c`) como gabarito são normalizadas em `src/curriculum.ts` para o texto da alternativa. N1 reconhece uma informação por vez; N2 conecta informações diretas; N3 aplica em uma situação de rotina; N4 compara condições; N5 decide e justifica com evidências.
 
-Leitura N1 também foi conferida quanto à quantidade silábica: há uma atividade com palavra de 1 sílaba (`SOL`), uma com 2 (`BO-TA`) e uma com 3 (`EN-TRA-DA`). Essa regra está protegida por teste automatizado.
+Na alfabetização, o início parte do alfabeto antes das sílabas. A progressão inclui palavras de 1, 2, 3, 4 e 5 sílabas em contextos visuais. Em Matemática, fundamentos numéricos precedem as operações; números romanos são complementares e não definem, sozinhos, o nível de Adição/Subtração.
 
-Nos níveis seguintes, a progressão inclui exposição explícita a palavras mais longas: `FERRAMENTA` com 4 sílabas em N2 e `ORGANIZAÇÃO` com 5 sílabas em N3. Isso mantém N1 acessível e amplia gradualmente a complexidade.
+## Sondagem inicial
 
-Também foi alterado um par de Multiplicação N5 que perguntava, em sequência, o total da Equipe A e o total da Equipe B. O segundo item agora confere o cálculo de uma produção já registrada, mudando a operação cognitiva sem mudar a dificuldade.
+A sondagem usa 60 itens calibrados (uma combinação competência × nível). Para cada competência, começa no N1: acerto avança um nível; erro encerra a progressão e registra o nível imediatamente anterior, com piso N1. O resultado é independente por competência. São no mínimo 12 e no máximo 60 respostas; o RH pode revisar o nivelamento.
 
-## Como a sondagem inicial funciona
+## Fontes e autoria
 
-A sondagem não aplica as 180 atividades. Ela usa um banco calibrado de **60 itens**, um item representativo para cada combinação competência × nível (12 × N1–N5).
+Os materiais EJA, Ensino Fundamental, Ensino Médio, Kumon e bancos enviados orientam habilidades, exemplos e dificuldade. Os itens são autorais e não reproduzem literalmente material de terceiros.
 
-Para cada uma das 12 competências:
+## Histórico de sincronização
 
-1. começa no item N1;
-2. resposta correta avança um nível, até N5;
-3. resposta incorreta encerra a progressão daquela competência e registra o nível imediatamente anterior, com piso N1;
-4. passa para a próxima competência;
-5. envia ao backend um resultado independente por competência (`level:N1` … `level:N5`).
-
-Assim, o colaborador pode estar em N3 em Leitura e N1 em Divisão. O diagnóstico não calcula uma média única e não deixa uma competência mascarar outra.
-
-São no mínimo 12 respostas (uma tentativa que encerra cada competência em N1) e no máximo 60 (acerto contínuo até N5 em todas). O nivelamento é por habilidade e pode ser revisado pelo RH.
-
-As questões da sondagem são as primeiras atividades de cada unidade N1–N5, com objetivo, fonte pedagógica e metadados de auditoria associados. Elas não são copiadas literalmente dos materiais de referência.
+- Snapshot de referência anterior: `1787699639513`.
+- Snapshot da Entrega 3: será registrado após testes, build e deploy desta auditoria.

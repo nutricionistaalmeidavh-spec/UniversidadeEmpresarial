@@ -39,7 +39,7 @@ const RAW:AdditionalVariant[]=[
     "skill": "adicao",
     "level": "N2",
     "topic": "SEQUÊNCIAS NUMÉRICAS",
-    "prompt": "Complete a sequência: 2, 4, 6, __, __, 12.",
+    "prompt": "Observe a regularidade de 2, 4 e 6; escreva os dois próximos números antes de 12.",
     "source": "1-Banco-Questoes-Matematica-Kumon.txt"
   },
   {
@@ -144,91 +144,91 @@ const RAW:AdditionalVariant[]=[
     "skill": "medidas",
     "level": "N2",
     "topic": "FORMAS GEOMÉTRICAS",
-    "prompt": null,
+    "prompt": "Observe um piso com quatro lados iguais: descreva a forma que você reconhece.",
     "source": "1-Banco-Questoes-Matematica-Kumon.txt"
   },
   {
     "skill": "medidas",
     "level": "N2",
     "topic": "FORMAS GEOMÉTRICAS",
-    "prompt": null,
+    "prompt": "Compare uma placa redonda e uma janela retangular: qual diferença de contorno aparece?",
     "source": "1-Banco-Questoes-Matematica-Kumon.txt"
   },
   {
     "skill": "medidas",
     "level": "N2",
     "topic": "FORMAS GEOMÉTRICAS",
-    "prompt": null,
+    "prompt": "Registre um objeto do trabalho que tenha formato triangular.",
     "source": "1-Banco-Questoes-Matematica-Kumon.txt"
   },
   {
     "skill": "medidas",
     "level": "N2",
     "topic": "FORMAS GEOMÉTRICAS",
-    "prompt": null,
+    "prompt": "Conte os lados de um retângulo desenhado e escreva o resultado.",
     "source": "1-Banco-Questoes-Matematica-Kumon.txt"
   },
   {
     "skill": "medidas",
     "level": "N2",
     "topic": "MEDIDAS E TEMPO (NOÇÕES BÁSICAS)",
-    "prompt": null,
+    "prompt": "Anote que instrumento você usaria para medir o comprimento de uma bancada.",
     "source": "1-Banco-Questoes-Matematica-Kumon.txt"
   },
   {
     "skill": "medidas",
     "level": "N2",
     "topic": "MEDIDAS E TEMPO (NOÇÕES BÁSICAS)",
-    "prompt": null,
+    "prompt": "Leia um relógio marcando 8h e registre o horário por extenso.",
     "source": "1-Banco-Questoes-Matematica-Kumon.txt"
   },
   {
     "skill": "medidas",
     "level": "N2",
     "topic": "MEDIDAS E TEMPO (NOÇÕES BÁSICAS)",
-    "prompt": null,
+    "prompt": "Explique qual unidade combina com a duração de um turno.",
     "source": "1-Banco-Questoes-Matematica-Kumon.txt"
   },
   {
     "skill": "medidas",
     "level": "N2",
     "topic": "MEDIDAS E TEMPO (NOÇÕES BÁSICAS)",
-    "prompt": null,
+    "prompt": "Organize 7h, 12h e 17h na ordem em que acontecem.",
     "source": "1-Banco-Questoes-Matematica-Kumon.txt"
   },
   {
     "skill": "medidas",
     "level": "N2",
     "topic": "MEDIDAS E TEMPO (NOÇÕES BÁSICAS)",
-    "prompt": null,
+    "prompt": "Descreva quando uma trena é mais útil que um relógio.",
     "source": "1-Banco-Questoes-Matematica-Kumon.txt"
   },
   {
     "skill": "porcentagem",
     "level": "N2",
     "topic": "DINHEIRO (NOÇÕES BÁSICAS)",
-    "prompt": null,
+    "prompt": "Registre duas formas de pagar uma compra de R$ 10,00.",
     "source": "1-Banco-Questoes-Matematica-Kumon.txt"
   },
   {
     "skill": "porcentagem",
     "level": "N2",
     "topic": "DINHEIRO (NOÇÕES BÁSICAS)",
-    "prompt": null,
+    "prompt": "Uma compra custa R$ 7,00 e você entrega R$ 10,00: escreva o troco.",
     "source": "1-Banco-Questoes-Matematica-Kumon.txt"
   },
   {
     "skill": "porcentagem",
     "level": "N2",
     "topic": "DINHEIRO (NOÇÕES BÁSICAS)",
-    "prompt": null,
+    "prompt": "Compare uma nota de R$ 5,00 com três moedas de R$ 1,00.",
     "source": "1-Banco-Questoes-Matematica-Kumon.txt"
   },
   {
     "skill": "porcentagem",
     "level": "N2",
     "topic": "DINHEIRO (NOÇÕES BÁSICAS)",
-    "prompt": null,
+    "prompt": "Explique por que conferir o troco evita engano.",
     "source": "1-Banco-Questoes-Matematica-Kumon.txt"
   },
   {
@@ -368,56 +368,56 @@ const RAW:AdditionalVariant[]=[
     "skill": "porcentagem",
     "level": "N2",
     "topic": "NÚMEROS RACIONAIS - FRAÇÕES",
-    "prompt": null,
+    "prompt": "Desenhe uma barra dividida em duas partes iguais e nomeie uma parte.",
     "source": "5-Lista-de-Exercicios-Matematica-EF.txt"
   },
   {
     "skill": "porcentagem",
     "level": "N2",
     "topic": "NÚMEROS RACIONAIS - FRAÇÕES",
-    "prompt": null,
+    "prompt": "Escreva uma fração que represente três partes de quatro.",
     "source": "5-Lista-de-Exercicios-Matematica-EF.txt"
   },
   {
     "skill": "porcentagem",
     "level": "N3",
     "topic": "NÚMEROS RACIONAIS - FRAÇÕES",
-    "prompt": null,
+    "prompt": "Compare metade e um quarto usando palavras simples.",
     "source": "5-Lista-de-Exercicios-Matematica-EF.txt"
   },
   {
     "skill": "porcentagem",
     "level": "N3",
     "topic": "NÚMEROS RACIONAIS - FRAÇÕES",
-    "prompt": null,
+    "prompt": "Relacione 1/2 a uma situação de repartir um material.",
     "source": "5-Lista-de-Exercicios-Matematica-EF.txt"
   },
   {
     "skill": "porcentagem",
     "level": "N4",
     "topic": "NÚMEROS RACIONAIS - FRAÇÕES",
-    "prompt": null,
+    "prompt": "Explique o que o número de baixo indica em 2/5.",
     "source": "5-Lista-de-Exercicios-Matematica-EF.txt"
   },
   {
     "skill": "porcentagem",
     "level": "N2",
     "topic": "OPERAÇÕES COM NÚMEROS REAIS",
-    "prompt": null,
+    "prompt": "Calcule 18 + 7 e registre como conferiu o resultado.",
     "source": "5-Lista-de-Exercicios-Matematica-EF.txt"
   },
   {
     "skill": "porcentagem",
     "level": "N3",
     "topic": "OPERAÇÕES COM NÚMEROS REAIS",
-    "prompt": null,
+    "prompt": "Retire 9 de  20 e escreva a conta completa.",
     "source": "5-Lista-de-Exercicios-Matematica-EF.txt"
   },
   {
     "skill": "porcentagem",
     "level": "N4",
     "topic": "OPERAÇÕES COM NÚMEROS REAIS",
-    "prompt": null,
+    "prompt": "Escolha uma estratégia para conferir 6 × 4 e descreva-a.",
     "source": "5-Lista-de-Exercicios-Matematica-EF.txt"
   },
   {
@@ -501,7 +501,7 @@ const RAW:AdditionalVariant[]=[
     "skill": "adicao",
     "level": "N2",
     "topic": "SEQUÊNCIAS E REGULARIDADES",
-    "prompt": "Complete a sequência: 2, 4, 6, __, __, 12.",
+    "prompt": "Encontre os termos que faltam na sequência par até chegar ao 12.",
     "source": "5-Lista-de-Exercicios-Matematica-EF.txt"
   },
   {
@@ -592,21 +592,21 @@ const RAW:AdditionalVariant[]=[
     "skill": "porcentagem",
     "level": "N2",
     "topic": "A MATEMÁTICA NA COMUNICAÇÃO - ESTATÍSTICA",
-    "prompt": null,
+    "prompt": "Conte quantas pessoas estão em uma frente e registre o total.",
     "source": "5-Lista-de-Exercicios-Matematica-EF.txt"
   },
   {
     "skill": "porcentagem",
     "level": "N3",
     "topic": "A MATEMÁTICA NA COMUNICAÇÃO - ESTATÍSTICA",
-    "prompt": null,
+    "prompt": "Compare dois registros de produção e diga qual é maior.",
     "source": "5-Lista-de-Exercicios-Matematica-EF.txt"
   },
   {
     "skill": "porcentagem",
     "level": "N4",
     "topic": "A MATEMÁTICA NA COMUNICAÇÃO - ESTATÍSTICA",
-    "prompt": null,
+    "prompt": "Explique por que anotar dados ajuda a decidir no trabalho.",
     "source": "5-Lista-de-Exercicios-Matematica-EF.txt"
   },
   {
@@ -676,21 +676,21 @@ const RAW:AdditionalVariant[]=[
     "skill": "medidas",
     "level": "N2",
     "topic": "CONVERSÃO DE UNIDADES DE MEDIDA",
-    "prompt": null,
+    "prompt": "Converta 2 metros em centímetros e escreva o cálculo.",
     "source": "5-Lista-de-Exercicios-Matematica-EF.txt"
   },
   {
     "skill": "medidas",
     "level": "N3",
     "topic": "CONVERSÃO DE UNIDADES DE MEDIDA",
-    "prompt": null,
+    "prompt": "Explique quando trocar metros por centímetros facilita a medição.",
     "source": "5-Lista-de-Exercicios-Matematica-EF.txt"
   },
   {
     "skill": "medidas",
     "level": "N4",
     "topic": "CONVERSÃO DE UNIDADES DE MEDIDA",
-    "prompt": null,
+    "prompt": "Registre uma medida de 1 quilômetro em metros.",
     "source": "5-Lista-de-Exercicios-Matematica-EF.txt"
   },
   {
@@ -844,77 +844,77 @@ const RAW:AdditionalVariant[]=[
     "skill": "escrita",
     "level": "N1",
     "topic": "LEITURA E CÓPIA DE FRASES SIMPLES",
-    "prompt": null,
+    "prompt": "Copie a frase “Use o capacete” e destaque a primeira palavra.",
     "source": "6-Banco-Questoes-Portugues-Alfabetizacao.txt"
   },
   {
     "skill": "escrita",
     "level": "N1",
     "topic": "LEITURA E CÓPIA DE FRASES SIMPLES",
-    "prompt": null,
+    "prompt": "Escreva uma frase curta avisando que a tarefa terminou.",
     "source": "6-Banco-Questoes-Portugues-Alfabetizacao.txt"
   },
   {
     "skill": "escrita",
     "level": "N1",
     "topic": "LEITURA E CÓPIA DE FRASES SIMPLES",
-    "prompt": null,
+    "prompt": "Leia “Pausa às dez” e registre o horário indicado.",
     "source": "6-Banco-Questoes-Portugues-Alfabetizacao.txt"
   },
   {
     "skill": "escrita",
     "level": "N1",
     "topic": "LEITURA E CÓPIA DE FRASES SIMPLES",
-    "prompt": null,
+    "prompt": "Monte uma mensagem simples para chamar um colega.",
     "source": "6-Banco-Questoes-Portugues-Alfabetizacao.txt"
   },
   {
     "skill": "compreensao",
     "level": "N1",
     "topic": "INTERPRETAÇÃO E VOCABULÁRIO",
-    "prompt": null,
+    "prompt": "Leia a palavra “entrada” e escreva uma situação em que ela aparece.",
     "source": "6-Banco-Questoes-Portugues-Alfabetizacao.txt"
   },
   {
     "skill": "compreensao",
     "level": "N1",
     "topic": "INTERPRETAÇÃO E VOCABULÁRIO",
-    "prompt": null,
+    "prompt": "Escolha um aviso do trabalho e explique o que ele quer dizer.",
     "source": "6-Banco-Questoes-Portugues-Alfabetizacao.txt"
   },
   {
     "skill": "compreensao",
     "level": "N1",
     "topic": "INTERPRETAÇÃO E VOCABULÁRIO",
-    "prompt": null,
+    "prompt": "Registre uma palavra que indique ação em uma instrução.",
     "source": "6-Banco-Questoes-Portugues-Alfabetizacao.txt"
   },
   {
     "skill": "compreensao",
     "level": "N1",
     "topic": "INTERPRETAÇÃO E VOCABULÁRIO",
-    "prompt": null,
+    "prompt": "Descreva como uma imagem pode ajudar a entender um aviso.",
     "source": "6-Banco-Questoes-Portugues-Alfabetizacao.txt"
   },
   {
     "skill": "escrita",
     "level": "N1",
     "topic": "PRODUÇÃO DE TEXTO CURTA",
-    "prompt": null,
+    "prompt": "Escreva um aviso curto sobre uma área molhada.",
     "source": "6-Banco-Questoes-Portugues-Alfabetizacao.txt"
   },
   {
     "skill": "escrita",
     "level": "N1",
     "topic": "PRODUÇÃO DE TEXTO CURTA",
-    "prompt": null,
+    "prompt": "Registre uma mensagem informando que faltou material.",
     "source": "6-Banco-Questoes-Portugues-Alfabetizacao.txt"
   },
   {
     "skill": "escrita",
     "level": "N1",
     "topic": "PRODUÇÃO DE TEXTO CURTA",
-    "prompt": null,
+    "prompt": "Escreva duas frases contando o que foi feito no turno.",
     "source": "6-Banco-Questoes-Portugues-Alfabetizacao.txt"
   }
 ];
