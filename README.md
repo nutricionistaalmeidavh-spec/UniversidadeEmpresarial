@@ -7,7 +7,7 @@ Aplicação de aprendizagem corporativa para alfabetização funcional, matemát
 - GitHub: `nutricionistaalmeidavh-spec/UniversidadeEmpresarial` (fonte versionada, branch `main`).
 - AppDeploy: `fluxodre-campo-b2u-clbfo5` (runtime operacional).
 - URL: https://fluxodre-campo-b2u-clbfo5.v2.appdeploy.ai/
-- Snapshot operacional mais recente: `1787705073327`.
+- Snapshot operacional mais recente: `1787705245732`.
 - 3 áreas visíveis, 12 competências, níveis N1–N5 e 60 unidades.
 - 180 atividades-base e 429 variantes autorais; 609 itens auditados.
 

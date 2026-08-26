@@ -5,7 +5,7 @@
 - GitHub (`nutricionistaalmeidavh-spec/UniversidadeEmpresarial`, `main`): fonte versionada do código.
 - AppDeploy (`fluxodre-campo-b2u-clbfo5`): runtime operacional publicado.
 - URL: https://fluxodre-campo-b2u-clbfo5.v2.appdeploy.ai/
-- Snapshot operacional mais recente: `1787705073327`.
+- Snapshot operacional mais recente: `1787705245732`.
 
 O GitHub e o AppDeploy devem permanecer alinhados. Arquivos locais ficam em `app/`; durante o deploy, os arquivos são enviados para os caminhos equivalentes do snapshot remoto. `training/legacy-lideranca/` é histórico preservado e não deve ser apagado.
 
@@ -54,4 +54,4 @@ Depois do deploy, consultar o status até `ready` e conferir:
 - Referência anterior: `1787699639513`.
 - Auditoria completa dos bancos: `1787704289733`.
 - Fundamentos numéricos: código `1787705002938`.
-- Snapshot operacional atual: `1787705073327`.
+- Snapshot operacional atual: `1787705245732`.
