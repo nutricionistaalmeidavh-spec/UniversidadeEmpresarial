@@ -49,6 +49,10 @@ Depois do deploy, consultar o status até `ready` e conferir:
 - bloqueio RBAC para Colaborador/Gestor;
 - layout web e mobile.
 
+## Integração contínua
+
+O workflow `.github/workflows/university-ci.yml` roda `npm ci`, `npm test` e `npm run build` em push e pull request para `main`. A proteção obrigatória da branch precisa ser ativada manualmente no GitHub, exigindo o job `validate` antes do merge.
+
 ## Histórico
 
 - Referência anterior: `1787699639513`.

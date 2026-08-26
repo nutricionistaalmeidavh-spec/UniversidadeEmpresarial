@@ -45,4 +45,10 @@ npm run build
 
 O deploy só deve ser feito após os testes e o build passarem. Consulte `APPDEPLOY_SYNC.md` para o registro operacional.
 
+## Integração contínua
+
+`.github/workflows/university-ci.yml` executa `npm ci`, `npm test` e `npm run build` dentro de `app/` em todo push na `main` e em todo pull request para a `main`. O workflow é a barreira automática recomendada antes de mesclar alterações.
+
+A exigência de aprovação do CI na proteção da branch `main` ainda precisa ser ativada nas configurações de Rulesets/Branch protection do GitHub, pois a integração disponível nesta sessão não expõe a operação de proteção de branch.
+
 As atividades são autorais e usam os materiais pedagógicos recebidos como referência, sem reprodução literal.
