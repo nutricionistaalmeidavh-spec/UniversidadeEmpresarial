@@ -7,6 +7,9 @@
         "dev": "vite",
         "build": "vite build",
         "preview": "vite preview",
+        "typecheck:critical": "tsc --noEmit --target ES2022 --module ES2022 --moduleResolution bundler --strict --skipLibCheck backend/access-control.ts backend/diagnostic-draft.ts backend/diagnostic-draft-store.ts src/admin-rh-model.ts",
+        "test:critical": "vitest run tests/auth-flow.test.ts tests/diagnostic-draft.test.ts tests/diagnostic-draft-store.test.ts tests/open-response.test.ts tests/admin-overview.test.ts tests/access-control.test.ts tests/admin-rh-model.test.ts tests/rules.test.ts",
+        "test:content": "vitest run tests/content-audit.test.ts",
         "test": "vitest run"
     },
     "dependencies": {

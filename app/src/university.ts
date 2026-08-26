@@ -9,6 +9,7 @@ import { selectSupportExcerpt } from './support-selector';
 import { progressMetrics } from './progress-metrics';
 import { nextDiagnosticLevel, canAccessAdmin as canAccessAdminRole, canManageRoles as canManageRolesRule } from './rules';
 import { SUPPORT_MATERIALS } from './support-materials';
+import { adminFailureDetail, adminGroupLabel, educationRoleLabel } from './admin-rh-model';
 type UnitState = {
     status: 'practice' | 'consolidated' | 'review' | 'pending_review';
     attempts: number;
@@ -45,7 +46,7 @@ let me: {
     participant: P;
 } | null = null;
 const S = 'mh-edu-session', L = ['N1', 'N2', 'N3', 'N4', 'N5'];
-const tok = () => localStorage.getItem(S) || '', done = () => new Set(me?.participant.completedUnits || []), admin = () => canAccessAdminRole(me?.participant.role), canManageRoles = () => canManageRolesRule(me?.participant.role), roleLabel = (r: string) => ({ superadmin: 'Superadmin', admin: 'Admin', rh: 'RH', gestor: 'Gestor', colaborador: 'Colaborador' }[r] || 'Colaborador'), all = () => T.flatMap(t => L.map((l, i) => ({ id: t[0] + '-' + l, t: t[0], n: t[1], i: t[2], l, k: i + 1 })));
+const tok = () => localStorage.getItem(S) || '', done = () => new Set(me?.participant.completedUnits || []), admin = () => canAccessAdminRole(me?.participant.role), canManageRoles = () => canManageRolesRule(me?.participant.role), all = () => T.flatMap(t => L.map((l, i) => ({ id: t[0] + '-' + l, t: t[0], n: t[1], i: t[2], l, k: i + 1 })));
 function say(x: string) { let e = document.getElementById('eduToast'); if (!e) {
     e = document.createElement('div');
     e.id = 'eduToast';
@@ -317,15 +318,7 @@ function evolucao() {
     document.getElementById('redoDiagnostic')?.addEventListener('click', diagnostico);
 }
 function rhLoading() { ui('Administração RH', '<article class="edu-card"><h1>Carregando Administração RH…</h1><p>Aguarde enquanto carregamos as informações administrativas.</p></article>', 'admin'); }
-function rhFailure(x: unknown) { const q = x as {
-    response?: {
-        status?: number;
-        data?: {
-            status?: number;
-        };
-    };
-    status?: number;
-}, status = Number(q.response?.status || q.response?.data?.status || q.status || 0), detail = status === 401 ? 'Sua sessão expirou. Entre novamente para acessar a Administração RH.' : status === 403 ? 'Você não tem permissão para acessar a Administração RH.' : 'Não foi possível carregar a Administração RH. Tente novamente.'; ui('Administração RH', '<article class="edu-card"><h1>Não foi possível abrir a Administração RH</h1><p>' + detail + '</p><button id="retryRh" class="edu-primary">Tentar novamente</button></article>', 'admin'); document.getElementById('retryRh')?.addEventListener('click', () => void showRh()); }
+function rhFailure(x: unknown) { const detail = adminFailureDetail(x); ui('Administração RH', '<article class="edu-card"><h1>Não foi possível abrir a Administração RH</h1><p>' + detail + '</p><button id="retryRh" class="edu-primary">Tentar novamente</button></article>', 'admin'); document.getElementById('retryRh')?.addEventListener('click', () => void showRh()); }
 async function showRh() { rhLoading(); try {
     await rh();
 }
@@ -336,14 +329,13 @@ async function rh() {
     if (!admin()) return home();
     const data = (await api.post('/api/edu/admin/overview', { token: tok() })).data;
     const esc = (value: string) => value.replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char] || char));
-    const groupLabel: Record<string, string> = { correct_now: 'Corrigir agora', needs_help: 'Pode precisar de ajuda', inactive: 'Sem atividade recente', evolving: 'Evoluindo' };
     const actions = (data.actionParticipants || []).map((person: { id: string; name: string; email: string; group: string; evidence: string; nextAction: string; difficulty?: { competency: string; score: number } | null }) =>
-        '<article class="edu-action-card ' + esc(person.group) + '"><small>' + esc(groupLabel[person.group] || person.group) + '</small><h3>' + esc(person.name) + '</h3><p>' + esc(person.evidence) + '</p><b>Próxima ação: ' + esc(person.nextAction) + '</b></article>').join('');
+        '<article class="edu-action-card ' + esc(person.group) + '"><small>' + esc(adminGroupLabel(person.group)) + '</small><h3>' + esc(person.name) + '</h3><p>' + esc(person.evidence) + '</p><b>Próxima ação: ' + esc(person.nextAction) + '</b></article>').join('');
     const pending = (data.pendingReviews || []).map((review: { id: string; participantName?: string; skill?: string; level?: string; question?: string; response?: string }) =>
         '<article class="review-item"><div><b>' + esc(review.participantName || 'Colaborador') + '</b><small>' + esc(review.skill || '') + ' · ' + esc(review.level || '') + '</small><p><b>Pergunta:</b> ' + esc(review.question || '') + '</p><p><b>Resposta:</b> ' + esc(review.response || '') + '</p></div><div class="review-actions"><button class="edu-primary" data-review-id="' + esc(review.id) + '" data-review-action="approve">Aprovar</button><button class="edu-secondary" data-review-id="' + esc(review.id) + '" data-review-action="needs_revision">Solicitar revisão</button></div></article>').join('');
     const people = (data.participants || []).map((person: { id: string; name: string; email?: string; role?: string; completedUnits?: string[]; diagnosticCompletedAt?: string }) => {
         const role = String(person.role || 'colaborador');
-        const roleControl = canManageRoles() ? '<select aria-label="Perfil de ' + esc(person.name) + '" data-role-id="' + esc(person.id) + '" data-role-current="' + esc(role) + '">' + ['superadmin', 'admin', 'rh', 'gestor', 'colaborador'].map(value => '<option value="' + value + '" ' + (value === role ? 'selected' : '') + '>' + roleLabel(value) + '</option>').join('') + '</select>' : roleLabel(role);
+        const roleControl = canManageRoles() ? '<select aria-label="Perfil de ' + esc(person.name) + '" data-role-id="' + esc(person.id) + '" data-role-current="' + esc(role) + '">' + ['superadmin', 'admin', 'rh', 'gestor', 'colaborador'].map(value => '<option value="' + value + '" ' + (value === role ? 'selected' : '') + '>' + educationRoleLabel(value) + '</option>').join('') + '</select>' : educationRoleLabel(role);
         return '<tr><td>' + esc(person.name) + '</td><td>' + esc(person.email || '—') + '</td><td>' + roleControl + '</td><td>' + (person.completedUnits?.length || 0) + '</td><td>' + (person.diagnosticCompletedAt ? 'Concluída' : 'Pendente') + '</td></tr>';
     }).join('');
     ui('Administração RH',
