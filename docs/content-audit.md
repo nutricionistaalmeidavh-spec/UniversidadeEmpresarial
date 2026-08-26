@@ -45,3 +45,4 @@ Os materiais EJA, Ensino Fundamental, Ensino Médio, Kumon e bancos enviados ori
 
 - Snapshot de referência anterior: `1787699639513`.
 - Snapshot da Entrega 3: `1787704289733` (QA sem erros de frontend, backend ou rede).
+- Entrega 4: fundamentos numéricos separados como pré-etapa de Adição/Subtração; snapshot de código `1787705002938`.
