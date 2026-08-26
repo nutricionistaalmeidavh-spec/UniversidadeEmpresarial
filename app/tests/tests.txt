@@ -1,51 +1,60 @@
 # Tests
 
-## Test 1 - Responder corretamente a sondagem e avançar [sanity]
-Viewport: mobile
-Covers: sondagem adaptativa, comparação de alternativa correta, progressão N1 para N2
-Description: Verifica que uma alternativa correta na sondagem é reconhecida e avança o nível calibrado.
-Steps:
-1. Abra Sondagem inicial em uma sessão autenticada sem diagnóstico concluído
-2. Na primeira questão de Leitura N1, escolha CANO para CA + NO
-3. Toque em Responder
-Expected: A sondagem avança para Leitura item calibrado 2/5 sem exibir dica de erro.
+## Test 1 - Retomar a jornada do colaborador [sanity]
+Viewport: mobile (375x667)
+Covers: autenticação, próxima ação, tarefa diária, aula, feedback e progresso
+Description: Confirma que um colaborador recorrente chega à atividade recomendada e recebe um resultado visível.
 
-## Test 2 - Registrar desempenho real e revisão espaçada
-Viewport: desktop
-Covers: POST /api/edu/unit, tentativas reais, erros, dicas, duração, reviewStage, intervalDays e nextReviewAt
-Description: Verifica que a unidade registra o esforço real e programa revisão progressiva.
 Steps:
-1. Abra Leitura N1, erre a primeira atividade uma vez e depois acerte as três
-2. Conclua a unidade e abra Meu desenvolvimento
-3. Abra Tarefas diárias e observe a próxima revisão
-Expected: Leitura registra 3 acertos em pelo menos 4 tentativas, pelo menos 1 erro e a primeira revisão fica programada para 1 dia.
+1. Entrar com a sessão de colaborador disponível
+2. Acionar "Continuar aprendendo" e responder uma questão objetiva
+3. Avançar para a próxima ação e abrir Meu desenvolvimento
 
-## Test 3 - Usar nível da própria competência na tarefa diária
-Viewport: mobile
-Covers: prática diária adaptativa e skillLevels por competência
-Description: Confirma que uma competência não herda o nível de Leitura.
-Steps:
-1. Use participante com níveis diferentes por competência
-2. Abra Tarefas diárias
-3. Compare a competência e nível da tarefa NOVA com Meu desenvolvimento
-Expected: O nível da tarefa corresponde ao nível salvo daquela própria competência.
+Expected: A resposta recebe feedback contextual e o progresso mostra o estado confirmado.
 
-## Test 4 - Administrar perfis por RBAC
-Viewport: desktop
-Covers: POST /api/edu/admin/overview, POST /api/edu/admin/role, papéis Superadmin/Admin/RH/Gestor/Colaborador, compatibilidade de sessão administrativa legada
-Description: Verifica que o painel RH usa papel da sessão e que um perfil autorizado pode alterar o papel de um participante.
-Steps:
-1. Entre pelo portal central com um Superadmin e abra Administração RH
-2. Altere um participante Colaborador para Gestor no campo Perfil
-3. Reabra Administração RH
-Expected: O participante permanece como Gestor, o painel continua mostrando as métricas curriculares e uma conta administrativa legada não perde o acesso durante a migração para RBAC.
+## Test 2 - Pausar e retomar a sondagem
+Viewport: mobile (375x667)
+Covers: primeiro acesso, rascunho persistente da sondagem e nivelamento
+Description: Confirma que a sondagem acolhedora pode ser interrompida sem perder respostas.
 
-## Test 5 - Bloquear RH para perfil sem permissão
-Viewport: mobile
-Covers: autorização RBAC, ocultação do menu Administração RH e bloqueio de POST /api/edu/admin/overview
-Description: Garante que Gestor e Colaborador não recebem acesso ao painel administrativo.
 Steps:
-1. Entre como participante com perfil Colaborador
-2. Confira a navegação lateral e tente acessar a visão administrativa pelo fluxo disponível
-3. Mantenha a sessão ativa e navegue pelas trilhas normalmente
-Expected: Administração RH não aparece para Colaborador; o painel administrativo não é liberado e as trilhas de estudo permanecem acessíveis.
+1. Iniciar a sondagem e responder uma questão
+2. Recarregar a página
+3. Retomar a sondagem
+
+Expected: A mesma competência e o próximo item aparecem, sem reiniciar o percurso.
+
+## Test 3 - Tratar respostas objetiva e aberta
+Viewport: desktop (1280x800)
+Covers: resposta incorreta, correção, resposta aberta e estado pending_review
+Description: Confirma os estados explícitos de correção e avaliação humana.
+
+Steps:
+1. Responder incorretamente uma questão objetiva e tentar novamente
+2. Responder corretamente e avançar
+3. Enviar uma resposta aberta válida
+
+Expected: O erro oferece orientação; o acerto confirma avanço; a aberta aparece como "Aguardando correção".
+
+## Test 4 - Orientar o RH para pendências
+Viewport: desktop (1280x800)
+Covers: autorização por papel, visão geral, fila de revisão e decisão do RH
+Description: Confirma que o RH encontra uma pendência e registra uma decisão acionável.
+
+Steps:
+1. Entrar com a sessão autorizada disponível e abrir Administração RH
+2. Abrir um participante com resposta pendente
+3. Aprovar ou solicitar revisão e confirmar a atualização
+
+Expected: A fila e o participante refletem a decisão e indicam a próxima ação.
+
+## Test 5 - Bloquear acesso sem sessão
+Viewport: desktop (1280x800)
+Covers: proteção de rota e mensagem de autenticação
+Description: Confirma que conteúdo privado não é exibido sem autenticação.
+
+Steps:
+1. Abrir a Universidade sem uma sessão válida
+2. Tentar acessar conteúdo de aprendizagem
+
+Expected: A tela de entrada é exibida e nenhum dado privado aparece.

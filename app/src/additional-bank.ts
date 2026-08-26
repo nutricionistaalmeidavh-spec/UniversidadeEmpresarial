@@ -1,4 +1,6 @@
-type AdditionalVariant={skill:'leitura'|'compreensao'|'escrita'|'adicao'|'multiplicacao'|'divisao'|'porcentagem'|'medidas';level:'N1'|'N2'|'N3'|'N4';topic:string;prompt:string;source:string};
+import { withCompetencyGuidance } from './content-guidance';
+
+type AdditionalVariant={skill:'leitura'|'compreensao'|'escrita'|'adicao'|'multiplicacao'|'divisao'|'porcentagem'|'medidas';level:'N1'|'N2'|'N3'|'N4';topic:string;prompt:string;source:string;kind?:'short-text';answer?:string;accept?:string[]};
 const RAW:AdditionalVariant[]=[
   {
     "skill": "adicao",
@@ -788,7 +790,12 @@ const RAW:AdditionalVariant[]=[
     "skill": "leitura",
     "level": "N1",
     "topic": "RIMAS E SONS FINAIS",
-    "prompt": "Complete a frase rimada: \"O gato subiu no muro, / e o rato ficou com ___\" (medo/susto - escolha a que rima).",
+    "prompt": "O gato subiu no muro, e o rato ficou no escuro",
+    "kind": "short-text",
+    "answer": "escuro",
+    "accept": [
+      "escuro"
+    ],
     "source": "6-Banco-Questoes-Portugues-Alfabetizacao.txt"
   },
   {
@@ -918,5 +925,4 @@ const RAW:AdditionalVariant[]=[
     "source": "6-Banco-Questoes-Portugues-Alfabetizacao.txt"
   }
 ];
-export const ADDITIONAL_VARIANTS=RAW.map(x=>({...x,kind:'text' as const,answer:'',hint:'Resposta aberta: registre o cálculo, a justificativa ou o exemplo solicitado.',source:x.source}));
-
+export const ADDITIONAL_VARIANTS=RAW.map(x=>withCompetencyGuidance(x.kind==='short-text'?{...x,kind:'short-text' as const,answer:x.answer||'',accept:x.accept||[],options:[]}:{...x,kind:'text' as const,answer:'',accept:[],options:[]}));

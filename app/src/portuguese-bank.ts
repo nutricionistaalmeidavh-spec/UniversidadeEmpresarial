@@ -1,3 +1,5 @@
+import { withCompetencyGuidance } from './content-guidance';
+
 type PortugueseVariant={skill:'leitura'|'compreensao'|'escrita';level:'N2'|'N3'|'N4';topic:string;prompt:string};
 const RAW:PortugueseVariant[]=[
   {
@@ -589,5 +591,4 @@ const RAW:PortugueseVariant[]=[
     "prompt": "Escolha um poema modernista (ou escreva um trecho no estilo modernista) e analise seus recursos de linguagem coloquial e verso livre."
   }
 ];
-export const PORTUGUESE_VARIANTS=RAW.map(x=>({...x,kind:'text' as const,answer:'',hint:'Resposta aberta: explique com suas palavras e, quando possível, dê um exemplo.',source:'Lista de Exercícios Português EM'}));
-
+export const PORTUGUESE_VARIANTS=RAW.map(x=>withCompetencyGuidance({...x,kind:'text' as const,answer:'',accept:[],options:[],source:'Lista de Exercícios Português EM'}));

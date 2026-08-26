@@ -13,6 +13,19 @@ const normalize = (value: string) => value
   .replace(/[^a-z0-9]+/g, ' ')
   .trim();
 
+const legacyGenericHints = new Set([
+  'Resposta aberta: registre o cálculo, a justificativa ou o exemplo solicitado.',
+  'Resposta aberta: explique com suas palavras e, quando possível, dê um exemplo.',
+  'Confira o material e digite ou selecione a resposta correta.',
+  'Resposta aberta: use o critério indicado no material.',
+]);
+
+const choiceAnswer = (item: { answer: string; options?: string[] }) => {
+  const answer = String(item.answer || '');
+  if (/^[a-e]$/i.test(answer)) return item.options?.[answer.toLowerCase().charCodeAt(0) - 97] || answer;
+  return answer;
+};
+
 const similarity = (a: string, b: string) => {
   const left = new Set(normalize(a).split(/\s+/));
   const right = new Set(normalize(b).split(/\s+/));
@@ -29,13 +42,20 @@ describe('auditoria semântica do banco de questões', () => {
     expect(Object.keys(CONTENT)).toHaveLength(60);
     expect(rows).toHaveLength(180);
     expect(rows.every(row => row.item.prompt.trim() && row.item.hint.trim())).toBe(true);
-    expect(rows.every(row => row.item.visual?.src && row.item.visual?.alt)).toBe(true);
+    expect(rows.every(row => !row.item.visual || (row.item.visual.src && row.item.visual.alt))).toBe(true);
   });
 
   it('não repete enunciados nem alternativas corretas entre as unidades', () => {
     const prompts = rows.map(row => normalize(row.item.prompt));
     expect(new Set(prompts).size).toBe(prompts.length);
-    expect(rows.every(({ item }) => item.kind === 'choice' || item.kind === 'text' || item.kind === 'short-text' || item.options?.includes(item.answer))).toBe(true);
+    expect(rows.filter(({ item }) => item.kind === 'choice').every(({ item }) => {
+      const options = item.options || [];
+      return options.length >= 2
+        && new Set(options).size === options.length
+        && [choiceAnswer(item), ...(item.accept || [])].map(normalize).every(answer => options.map(normalize).includes(answer));
+    })).toBe(true);
+    expect(rows.filter(({ item }) => item.kind === 'short-text').every(({ item }) => item.answer.trim() || (item.accept || []).some(answer => answer.trim()))).toBe(true);
+    expect(rows.filter(({ item }) => item.kind === 'text').every(({ item }) => item.hint.trim())).toBe(true);
   });
 
   it('não mantém pares de enunciados excessivamente semelhantes', () => {
@@ -71,7 +91,7 @@ describe('auditoria semântica do banco de questões', () => {
   it('incorpora banco adicional de Português sem alterar a quantidade por unidade', () => {
     const variants = Object.values(QUESTION_BANK).flat();
     expect(variants.length).toBeGreaterThan(0);
-    expect(variants.every(item => (item.kind === 'choice' || item.kind === 'text' || item.kind === 'short-text') && item.visual?.src)).toBe(true);
+    expect(variants.every(item => item.kind === 'choice' || item.kind === 'text' || item.kind === 'short-text')).toBe(true);
     expect(Object.entries(CONTENT).every(([id, unit]) => selectQuestions(id, unit.items, 42).length === 3)).toBe(true);
     expect(SUPPORT_MATERIALS.matematica.length).toBeGreaterThan(100);
     expect(SUPPORT_MATERIALS.portugues.length).toBeGreaterThan(100);
@@ -92,12 +112,43 @@ describe('auditoria semântica do banco de questões', () => {
     expect(variants.every(({ item }) => skills.has(item.skill) && levels.has(item.level) && kinds.has(item.kind))).toBe(true);
     const renderedVariants = Object.values(QUESTION_BANK).flat();
     expect(renderedVariants).toHaveLength(429);
-    expect(renderedVariants.every(item => item.visual?.src && item.visual?.alt)).toBe(true);
-    const renderedByPrompt = new Map(renderedVariants.map(item => [item.prompt, item]));
-    const invalidChoices = variants.filter(({ item }) => item.kind === 'choice' && !(renderedByPrompt.get(item.prompt)?.options?.length && renderedByPrompt.get(item.prompt)?.options?.includes(String(renderedByPrompt.get(item.prompt)?.answer))));
+    expect(renderedVariants.every(item => !item.visual || (item.visual.src && item.visual.alt))).toBe(true);
+    const invalidChoices = variants.filter(({ item }) => item.kind === 'choice' && !(() => {
+      const options = item.options || [];
+      const normalizedOptions = options.map(normalize);
+      const accepted = [choiceAnswer(item), ...(item.accept || [])].map(normalize);
+      return options.length >= 2
+        && new Set(options).size === options.length
+        && accepted.every(answer => normalizedOptions.includes(answer));
+    })());
     expect(invalidChoices).toEqual([]);
-    expect(variants.filter(({ item }) => item.kind === 'short-text').every(({ item }) => item.answer.trim().length > 0)).toBe(true);
-    expect(variants.filter(({ item }) => item.kind === 'text').every(({ item }) => item.answer === '')).toBe(true);
+    expect(variants.filter(({ item }) => item.kind === 'short-text').every(({ item }) => item.answer.trim().length > 0 || (item.accept || []).some(answer => answer.trim().length > 0))).toBe(true);
+    expect(variants.filter(({ item }) => item.kind === 'text').every(({ item }) => (
+      item.reviewCriteria?.trim()
+      && Number.isInteger(item.minLength)
+      && Number(item.minLength) > 0
+      && item.hint.trim()
+      && !legacyGenericHints.has(item.hint)
+    ))).toBe(true);
+    expect(variants.every(({ item }) => item.source.trim().length > 0)).toBe(true);
+  });
+
+  it('evita tom infantilizante, instruções extensas e visuais decorativos', () => {
+    const all = [...rows.map(({ item }) => item), ...Object.values(QUESTION_BANK).flat()];
+    const forbidden = /aluninho|campeãozinho|até uma criança|muito facinho|brincadeirinha|coisa de criança/i;
+    expect(all.filter(item => forbidden.test(`${item.prompt} ${item.hint}`))).toEqual([]);
+    expect(all.filter(item => item.prompt.trim().split(/\s+/).length > 55)).toEqual([]);
+    expect(all.filter(item => item.visual?.src.startsWith('data:image/svg+xml'))).toEqual([]);
+  });
+
+  it('mantém a rima de muro com uma conclusão objetiva e gabaritada', () => {
+    const item = ADDITIONAL_VARIANTS.find(variant => variant.prompt.includes('gato subiu no muro'));
+    expect(item).toMatchObject({
+      kind: 'short-text',
+      prompt: 'O gato subiu no muro, e o rato ficou no escuro',
+      answer: 'escuro',
+    });
+    expect(item?.accept || []).toContain('escuro');
   });
 
   it('mantém compatibilidade competência × nível e limita seleção a três itens', () => {
@@ -107,6 +158,19 @@ describe('auditoria semântica do banco de questões', () => {
     });
     expect(allVariants.every(({ item, skill, level }) => item.skill === skill && item.level === level)).toBe(true);
     expect(Object.entries(CONTENT).every(([id, unit]) => selectQuestions(id, unit.items, 2026).length === 3)).toBe(true);
+  });
+
+  it('seleciona no máximo uma resposta aberta em uma aula de três itens com oferta objetiva', () => {
+    for (const [id, unit] of Object.entries(CONTENT)) {
+      const pool = [...unit.items, ...(QUESTION_BANK[id] || [])];
+      const objectiveCount = pool.filter(item => item.kind !== 'text').length;
+      if (objectiveCount < 2) continue;
+      for (const seed of [1, 42, 2026, 99991]) {
+        const selected = selectQuestions(id, unit.items, seed);
+        expect(selectQuestions(id, unit.items, seed)).toEqual(selected);
+        expect(selected.filter(item => item.kind === 'text').length).toBeLessThanOrEqual(1);
+      }
+    }
   });
 
   it('aponta duplicidades exatas e similaridade lexical sem apagar conteúdo', () => {
