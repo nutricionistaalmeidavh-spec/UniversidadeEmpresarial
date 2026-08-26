@@ -44,4 +44,4 @@ Os materiais EJA, Ensino Fundamental, Ensino Médio, Kumon e bancos enviados ori
 ## Histórico de sincronização
 
 - Snapshot de referência anterior: `1787699639513`.
-- Snapshot da Entrega 3: `1787704227152` (QA sem erros de frontend, backend ou rede).
+- Snapshot da Entrega 3: `1787704289733` (QA sem erros de frontend, backend ou rede).
