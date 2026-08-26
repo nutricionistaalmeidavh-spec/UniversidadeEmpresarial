@@ -47,7 +47,6 @@ describe('auditoria semântica do banco de questões', () => {
         }
       }
     }
-    if (similar.length) console.log('SIMILAR', similar.map(pair => pair.split(' <> ').map(id => all.find(row => row.id === id)?.prompt)));
     expect(similar).toEqual([]);
   });
 
