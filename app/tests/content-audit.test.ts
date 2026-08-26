@@ -62,9 +62,10 @@ describe('auditoria semântica do banco de questões', () => {
     expect(CONTENT['leitura-N1'].items[1].answer).toBe('N');
     expect(CONTENT['leitura-N2'].material).toContain('FERRAMENTA = fer-ra-men-ta (4 sílabas)');
     expect(CONTENT['leitura-N3'].material).toContain('ORGANIZAÇÃO = or-ga-ni-za-ção (5 sílabas)');
-    expect(CONTENT['adicao-N1'].material).toContain('Números e operações');
+    expect(CONTENT['adicao-N1'].material).toContain('Fundamentos numéricos');
     expect(CONTENT['adicao-N1'].material).toContain('I=1, V=5, X=10');
-    expect(CONTENT['adicao-N1'].items[1].answer).toBe('V');
+    expect(CONTENT['adicao-N1'].items[1].answer).toBe('7');
+    expect(CONTENT['adicao-N1'].items[2].answer).toBe('Juntar');
   });
 
   it('incorpora banco adicional de Português sem alterar a quantidade por unidade', () => {

@@ -51,4 +51,11 @@ describe('conclusão e banco curricular', () => {
     expect(Object.keys(CONTENT)).toHaveLength(60);
     expect(Object.keys(CALIBRATION_BANK)).toHaveLength(60);
   });
+
+  it('usa fundamentos numéricos no início de adição sem exigir algarismos romanos', () => {
+    const first = CALIBRATION_BANK['adicao-N1'];
+    expect(first.prompt).toContain('maior quantidade');
+    expect(first.prompt).not.toMatch(/romano/i);
+    expect(CONTENT['adicao-N1'].material).toContain('conteúdo complementar');
+  });
 });
