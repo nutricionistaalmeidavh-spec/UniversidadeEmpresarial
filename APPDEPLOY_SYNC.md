@@ -5,7 +5,7 @@
 - GitHub (`nutricionistaalmeidavh-spec/UniversidadeEmpresarial`, `main`): fonte versionada do código.
 - AppDeploy (`fluxodre-campo-b2u-clbfo5`): runtime operacional publicado.
 - URL: https://fluxodre-campo-b2u-clbfo5.v2.appdeploy.ai/
-- Snapshot operacional mais recente: `1787705245732`.
+- Snapshot operacional mais recente: `1787763567892` (UX v2).
 
 O GitHub e o AppDeploy devem permanecer alinhados. Arquivos locais ficam em `app/`; durante o deploy, os arquivos são enviados para os caminhos equivalentes do snapshot remoto. `training/legacy-lideranca/` é histórico preservado e não deve ser apagado.
 
@@ -54,6 +54,12 @@ Depois do deploy, consultar o status até `ready` e conferir:
 O workflow `.github/workflows/university-ci.yml` roda `npm ci`, `npm test` e `npm run build` em push e pull request para `main`. A proteção obrigatória da branch precisa ser ativada manualmente no GitHub, exigindo o job `validate` antes do merge.
 
 ## Histórico
+
+- UX v2 publicada no AppDeploy: snapshot `1787763567892`, estado `ready`, sem erros de frontend, backend ou rede na verificação de 2026-08-26.
+- UX v2 candidata à publicação: commit `7300435` (`codex/ux-v2`), tarefas 1–18.
+- Escopo: primeiro acesso, retomada da sondagem, próxima ação, aula/feedback, progressão, navegação, painel RH, acessibilidade visual, motivação adulta e revisão editorial.
+- Gate local em 2026-08-26: **66/66 testes** e build Vite aprovados; diff sem whitespace inválido, credenciais adicionadas ou arquivos fora do escopo.
+- Rollback: republicar o commit `7a9f80d167d98165ddd84da6ef65352cdc6d37dd`; os novos campos persistidos são aditivos e podem permanecer sem afetar a versão anterior.
 
 - Referência anterior: `1787699639513`.
 - Auditoria completa dos bancos: `1787704289733`.

@@ -1,3 +1,5 @@
+import { withCompetencyGuidance } from './content-guidance';
+
 type YoungAdultVariant={skill:'leitura'|'compreensao'|'escrita'|'adicao'|'multiplicacao'|'porcentagem';level:'N1'|'N2'|'N3'|'N4'|'N5';topic:string;prompt:string;answer:string;kind:'choice'|'short-text'|'text';options:string[];accept:string[];source:string};
 const RAW:YoungAdultVariant[]=[
   {
@@ -2680,4 +2682,4 @@ const RAW:YoungAdultVariant[]=[
     "source": "questoes_jovens_adultos_5_niveis.txt"
   }
 ];
-export const YOUNG_ADULT_VARIANTS=RAW.map(x=>({...x,hint:x.kind==='choice'||x.kind==='short-text'?'Confira o material e digite ou selecione a resposta correta.':'Resposta aberta: use o critério indicado no material.',visual:undefined}));
+export const YOUNG_ADULT_VARIANTS=RAW.map(x=>({...withCompetencyGuidance(x),visual:undefined}));
