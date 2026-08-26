@@ -25,15 +25,18 @@ O GitHub e o AppDeploy devem permanecer alinhados. Arquivos locais ficam em `app
 ## Arquivos principais sincronizados
 
 - `src/curriculum.ts` e bancos de variantes.
-- `src/university.ts`.
-- `backend/education.ts` e `backend/unit-policy.ts`.
-- `tests/` e `docs/content-audit.md`.
+- `src/university.ts` e `src/admin-rh-model.ts`.
+- `backend/education.ts`, `backend/access-control.ts`, `backend/diagnostic-draft-store.ts` e `backend/unit-policy.ts`.
+- `tests/`, `docs/content-audit.md` e documentação de hardening.
 
 ## QA mínimo antes de publicar
 
 Dentro de `app/`, executar:
 
 ```text
+npm run typecheck:critical
+npm run test:critical
+npm run test:content
 npm test
 npm run build
 ```
@@ -51,7 +54,7 @@ Depois do deploy, consultar o status até `ready` e conferir:
 
 ## Integração contínua
 
-O workflow `.github/workflows/university-ci.yml` roda `npm ci`, `npm test` e `npm run build` em push e pull request para `main`. A proteção obrigatória da branch precisa ser ativada manualmente no GitHub, exigindo o job `validate` antes do merge.
+O workflow `.github/workflows/university-ci.yml` roda instalação, typecheck crítico, regressões P0, auditoria curricular, suíte completa e build em push e pull request para `main`. A UX v2 confirmou que push direto para `main` é bloqueado; manter o job `Test and build` obrigatório no Ruleset.
 
 ## Histórico
 
@@ -64,4 +67,5 @@ O workflow `.github/workflows/university-ci.yml` roda `npm ci`, `npm test` e `np
 - Referência anterior: `1787699639513`.
 - Auditoria completa dos bancos: `1787704289733`.
 - Fundamentos numéricos: código `1787705002938`.
-- Snapshot operacional atual: `1787705245732`.
+- Snapshot operacional atual: `1787763567892` (UX v2).
+- Hardening/manutenção v1: publicar somente após merge no Git e CI verde; até lá, o snapshot acima continua sendo a referência operacional.

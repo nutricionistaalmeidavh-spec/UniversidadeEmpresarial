@@ -1,7 +1,9 @@
 import { db, error, json, requireAuth, withScopes } from '@appdeploy/sdk';
 import { evaluateObjectiveConsolidation } from './unit-policy';
 import { buildAdminOverview, canAccessAdminOverview } from './admin-overview';
-import { canClearDiagnosticDraftAfterFinalization, createDiagnosticDraft, sanitizeDiagnosticDraft, type DiagnosticDraft } from './diagnostic-draft';
+import { canClearDiagnosticDraftAfterFinalization, createDiagnosticDraft, sanitizeDiagnosticDraft } from './diagnostic-draft';
+import { clearDiagnosticDraft, readDiagnosticDraft, saveDiagnosticDraft, type DiagnosticDraftStore, type StoredDiagnosticDraftRecord } from './diagnostic-draft-store';
+import { canManageEducationRoles, educationJobRole, educationRoleChangeDecision, effectiveEducationRole, isAdministrationRole, isEducationRole, type EduRole } from './access-control';
 import { hasActivePendingReview, normalizeOpenResponses } from './open-response-policy';
 type UnitProgress = {
     status: 'practice' | 'consolidated' | 'review' | 'pending_review';
@@ -21,7 +23,6 @@ type UnitProgress = {
     nextReviewAt?: string;
     updatedAt?: string;
 };
-type EduRole = 'superadmin' | 'admin' | 'rh' | 'gestor' | 'colaborador';
 type EduParticipant = {
     name: string;
     phone: string;
@@ -81,9 +82,15 @@ type ReviewRecord = {
         errors: number;
     }>;
 };
-const EDU_ROLES: EduRole[] = ['superadmin', 'admin', 'rh', 'gestor', 'colaborador'], ADMIN_ROLES: EduRole[] = ['superadmin', 'admin', 'rh'], MODULES = ['leitura', 'compreensao', 'escrita', 'adicao-subtracao', 'multiplicacao', 'divisao', 'porcentagem', 'medidas', 'seguranca', 'direitos', 'saude', 'tecnologia'];
+const MODULES = ['leitura', 'compreensao', 'escrita', 'adicao-subtracao', 'multiplicacao', 'divisao', 'porcentagem', 'medidas', 'seguranca', 'direitos', 'saude', 'tecnologia'];
 const enc = new TextEncoder(), now = () => new Date().toISOString(), rec = (v: unknown): Record<string, unknown> => v && typeof v === 'object' && !Array.isArray(v) ? v as Record<string, unknown> : {};
 const strMap = (v: unknown) => Object.fromEntries(Object.entries(rec(v)).map(([k, x]) => [k, String(x ?? '')]));
+const diagnosticDraftStore: DiagnosticDraftStore = {
+    list: async table => (await db.list<StoredDiagnosticDraftRecord>(table, { limit: 1 })).items,
+    add: async (table, record) => { await db.add(table, [record]); },
+    update: async (table, id, record) => { await db.update(table, [{ id, record }]); },
+    delete: async (table, id) => { await db.delete(table, [id]); },
+};
 const keyHash = (v: string) => { let h = 2166136261; for (let i = 0; i < v.length; i++) {
     h ^= v.charCodeAt(i);
     h = Math.imul(h, 16777619);
@@ -99,7 +106,7 @@ async function issue(id: string) { const t = crypto.randomUUID().replace(/-/g, '
 async function participant(t: string) { if (t.length < 40)
     return null; const s = (await db.list<EduSession>(sessionTable(t), { limit: 1 })).items[0]; if (!s || s.expiresAt < now())
     return null; const [p] = await db.get<EduParticipant>('edu_participants', [s.participantId]); return p?.status === 'active' ? { ...p, id: s.participantId } : null; }
-const effectiveRole = (p: EduParticipant): EduRole => p.role || (p.jobRole === 'Administração' ? 'admin' : 'colaborador');
+const effectiveRole = (p: EduParticipant): EduRole => effectiveEducationRole(p.role, p.jobRole);
 function pub(p: EduParticipant & {
     id: string;
 }) { return { id: p.id, name: p.name, phone: p.phone, email: p.email || null, jobRole: p.jobRole, role: effectiveRole(p), mustChangePassword: p.mustChangePassword, level: p.level || null, skillLevels: p.skillLevels || {}, skillScores: p.skillScores || {}, unitProgress: p.unitProgress || {}, progress: p.progress || 0, completedModules: p.completedModules || [], completedUnits: p.completedUnits || [], readingScore: p.readingScore ?? null, writingScore: p.writingScore ?? null, numeracyScore: p.numeracyScore ?? null, diagnosticCompletedAt: p.diagnosticCompletedAt || null, lastActivityAt: p.lastActivityAt || null }; }
@@ -110,22 +117,22 @@ export async function createCentralEducationSession(input: {
     name?: string;
     role?: EduRole;
 }) { const em = email(input.email); if (!em)
-    throw new Error('E-mail corporativo inválido.'); const desired = input.role && EDU_ROLES.includes(input.role) ? input.role : 'colaborador'; let p = await find(emailTable(em)); if (!p) {
-    const s = crypto.randomUUID().replace(/-/g, ''), stamp = now(), x: EduParticipant = { name: input.name || em.split('@')[0], phone: '', email: em, jobRole: ADMIN_ROLES.includes(desired) ? 'Administração' : 'Colaborador', role: desired, status: 'active', passwordSalt: s, passwordHash: await hash(crypto.randomUUID(), s), mustChangePassword: false, createdAt: stamp, updatedAt: stamp }, [id] = await db.add('edu_participants', [x]);
+    throw new Error('E-mail corporativo inválido.'); const desired = input.role && isEducationRole(input.role) ? input.role : 'colaborador'; let p = await find(emailTable(em)); if (!p) {
+    const s = crypto.randomUUID().replace(/-/g, ''), stamp = now(), x: EduParticipant = { name: input.name || em.split('@')[0], phone: '', email: em, jobRole: educationJobRole(desired), role: desired, status: 'active', passwordSalt: s, passwordHash: await hash(crypto.randomUUID(), s), mustChangePassword: false, createdAt: stamp, updatedAt: stamp }, [id] = await db.add('edu_participants', [x]);
     if (!id)
         throw new Error('Não foi possível preparar o acesso à Universidade.');
     await db.add(emailTable(em), [{ participantId: id, createdAt: stamp }]);
     p = { ...x, id };
 }
 else if (input.role && p.role !== desired) {
-    await db.update('edu_participants', [{ id: p.id, record: { ...p, role: desired, jobRole: ADMIN_ROLES.includes(desired) ? 'Administração' : p.jobRole, updatedAt: now() } }]);
-    p = { ...p, role: desired, jobRole: ADMIN_ROLES.includes(desired) ? 'Administração' : p.jobRole };
+    await db.update('edu_participants', [{ id: p.id, record: { ...p, role: desired, jobRole: educationJobRole(desired, p.jobRole), updatedAt: now() } }]);
+    p = { ...p, role: desired, jobRole: educationJobRole(desired, p.jobRole) };
 } return { token: await issue(p.id), participant: pub(p) }; }
 export const EDUCATION_ROUTES = { 'POST /api/edu/login': [async (c) => { const b = rec(c.body), id = String(b.identifier || '').trim(), ph = phone(id), em = email(id), pass = String(b.password || ''); if ((!ph && !em) || pass.length < 6)
             return error('E-mail/celular ou senha inválidos.', 400); const p = await find(em ? emailTable(em) : phoneTable(ph)); if (!p || await hash(pass, p.passwordSalt) !== p.passwordHash)
-            return error('E-mail/celular ou senha inválidos.', 401); return json({ token: await issue(p.id), participant: pub(p) }); }], 'GET /api/edu/email/session': [requireAuth(), withScopes('email', 'profile'), async (c) => { const em = email(c.user!.email || ''); let p = await find(emailTable(em)); const grant = (await db.list<Record<string, unknown>>(centralGrantTable(em), { limit: 1 })).items[0], validGrant = !!grant && String(grant.email || '') === em && String(grant.expiresAt || '') > now(), grantRole = EDU_ROLES.includes(String(grant?.role || '') as EduRole) ? String(grant!.role) as EduRole : 'colaborador'; if (!p && !validGrant)
+            return error('E-mail/celular ou senha inválidos.', 401); return json({ token: await issue(p.id), participant: pub(p) }); }], 'GET /api/edu/email/session': [requireAuth(), withScopes('email', 'profile'), async (c) => { const em = email(c.user!.email || ''); let p = await find(emailTable(em)); const grant = (await db.list<Record<string, unknown>>(centralGrantTable(em), { limit: 1 })).items[0], validGrant = !!grant && String(grant.email || '') === em && String(grant.expiresAt || '') > now(), grantRole = isEducationRole(String(grant?.role || '')) ? String(grant!.role) as EduRole : 'colaborador'; if (!p && !validGrant)
             return error('Este e-mail não foi liberado.', 403); if (!p) {
-            const s = crypto.randomUUID().replace(/-/g, ''), stamp = now(), x: EduParticipant = { name: c.user!.name || em.split('@')[0], phone: '', email: em, jobRole: ADMIN_ROLES.includes(grantRole) ? 'Administração' : 'Colaborador', role: grantRole, status: 'active', passwordSalt: s, passwordHash: await hash(crypto.randomUUID(), s), mustChangePassword: false, createdAt: stamp, updatedAt: stamp }, [id] = await db.add('edu_participants', [x]);
+            const s = crypto.randomUUID().replace(/-/g, ''), stamp = now(), x: EduParticipant = { name: c.user!.name || em.split('@')[0], phone: '', email: em, jobRole: educationJobRole(grantRole), role: grantRole, status: 'active', passwordSalt: s, passwordHash: await hash(crypto.randomUUID(), s), mustChangePassword: false, createdAt: stamp, updatedAt: stamp }, [id] = await db.add('edu_participants', [x]);
             if (!id)
                 return error('Não foi possível preparar o acesso.', 500);
             await db.add(emailTable(em), [{ participantId: id, createdAt: stamp }]);
@@ -143,7 +150,7 @@ export const EDUCATION_ROUTES = { 'POST /api/edu/login': [async (c) => { const b
             await db.update(table, [{ id: old.id, record }]);
         else
             await db.add(table, [record]); const finalDiagnosticSaved = true; await db.update('edu_participants', [{ id: p.id, record: { ...p, ...result, skillLevels: result.skillLevels, skillScores: result.skillScores, progress: Math.max(p.progress || 0, 10), diagnosticCompletedAt: stamp, lastActivityAt: stamp, updatedAt: stamp } }]); const participantUpdated = true; if (canClearDiagnosticDraftAfterFinalization(finalDiagnosticSaved, participantUpdated))
-            await clearStoredDiagnosticDraft(p.id); return json({ result }); }], 'POST /api/edu/progress': [async (c) => { const b = rec(c.body), p = await participant(String(b.token || '')), m = String(b.module || ''); if (!p)
+            await clearDiagnosticDraft(diagnosticDraftStore, p.id); return json({ result }); }], 'POST /api/edu/progress': [async (c) => { const b = rec(c.body), p = await participant(String(b.token || '')), m = String(b.module || ''); if (!p)
             return error('Sessão expirada.', 401); if (p.mustChangePassword)
             return error('Altere a senha provisória para continuar.', 403); if (!MODULES.includes(m))
             return error('Módulo inválido.', 400); const completed = Array.from(new Set([...(p.completedModules || []), m])); await db.update('edu_participants', [{ id: p.id, record: { ...p, completedModules: completed, progress: Math.round(completed.length / MODULES.length * 100), updatedAt: now() } }]); return json({ ok: true, completedModules: completed }); }], 'POST /api/edu/unit': [async (c) => { const b = rec(c.body), p = await participant(String(b.token || '')), u = String(b.unit || ''); if (!p)
@@ -153,34 +160,22 @@ export const EDUCATION_ROUTES = { 'POST /api/edu/login': [async (c) => { const b
             return error('Esta unidade aguarda correção do RH.', 409); const attempts = Math.max(1, Math.min(99, Math.floor(Number(b.attempts || 1)))), errors = Math.max(0, Math.min(attempts, Math.floor(Number(b.errors || 0)))), hints = Math.max(0, Math.min(errors, Math.floor(Number(b.hints || errors)))), durationSec = Math.max(1, Math.min(7200, Math.floor(Number(b.durationSec || 1)))), rawStats = Array.isArray(b.questionStats) ? b.questionStats.slice(0, 3) : [], questionStats = rawStats.map(x => { const q = rec(x); return { attempts: Math.max(0, Math.min(20, Math.floor(Number(q.attempts || 0)))), errors: Math.max(0, Math.min(20, Math.floor(Number(q.errors || 0)))) }; }), consolidation = evaluateObjectiveConsolidation(questionStats), correct = consolidation.correctItems, consolidated = consolidation.consolidated, openResponses = normalizeOpenResponses(b.openResponses), hasOpenAnswer = openResponses.length > 0, previous = p.unitProgress?.[u], first = !previous?.completedAt, due = !!previous && (previous.status === 'review' || previous.status === 'pending_review' || !previous.nextReviewAt || Date.parse(previous.nextReviewAt) <= Date.now()), previousStage = Math.max(0, Math.min(4, Math.floor(Number(previous?.reviewStage ?? 0)))), reviewStage = first ? 0 : due ? (errors === 0 ? Math.min(4, previousStage + 1) : Math.max(0, previousStage - 1)) : previousStage, intervals = [1, 3, 7, 14, 30], intervalDays = intervals[reviewStage], reviewCount = Math.max(0, Math.floor(Number(previous?.reviewCount || 0))) + (first ? 0 : due ? 1 : 0), stamp = now(), nextReviewAt = new Date(Date.now() + intervalDays * 86400000).toISOString(), pendingId = crypto.randomUUID(), pendingReviews = (p.pendingReviews || []).filter(x => x.unit !== u), pending = hasOpenAnswer ? { id: pendingId, participantId: p.id, unit: u, skill: u.replace(/-N[1-5]$/, ''), level: u.match(/N[1-5]$/)?.[0] || 'N1', question: openResponses.map(x => x.question).filter(Boolean).join(' | ').slice(0, 1000) || 'Resposta aberta da unidade', response: openResponses.map(x => x.response).filter(Boolean).join(' | ').slice(0, 4000), submittedAt: stamp, attempts, correct, errors, questionStats } : null, entry = hasOpenAnswer ? { status: 'pending_review', attempts, correct, errors, hints, durationSec, questionStats, reviewStage, reviewCount, intervalDays, updatedAt: stamp } : consolidated ? { status: 'consolidated', attempts, correct, errors, hints, durationSec, questionStats, reviewStage, reviewCount, intervalDays, completedAt: stamp, nextReviewAt, updatedAt: stamp } : { status: 'practice', attempts, correct, errors, hints, durationSec, questionStats, reviewStage: previous?.reviewStage ?? 0, reviewCount: previous?.reviewCount ?? 0, intervalDays: previous?.intervalDays, updatedAt: stamp }, progress = { ...(p.unitProgress || {}), [u]: entry }, nextPendingReviews = pending ? [...pendingReviews, pending] : pendingReviews, done = consolidated && !hasOpenAnswer ? Array.from(new Set([...(p.completedUnits || []), u])) : (p.completedUnits || []).filter(x => x !== u); await db.update('edu_participants', [{ id: p.id, record: { ...p, pendingReviews: nextPendingReviews, completedUnits: done, unitProgress: progress, progress: Math.round(done.length / 60 * 100), lastActivityAt: stamp, updatedAt: stamp } }]); return json({ ok: true, consolidated: consolidated && !hasOpenAnswer, status: entry.status, pendingReview: pending, completedUnits: done, unitProgress: progress, review: consolidated && !hasOpenAnswer ? { reviewStage, reviewCount, intervalDays, nextReviewAt } : null }); }], 'POST /api/edu/admin/overview': [async (c) => { const actor = await participant(String(rec(c.body).token || '')); if (!actor)
             return error('Sessão expirada.', 401); if (!canAccessAdminOverview(effectiveRole(actor)))
             return error('Acesso restrito à Administração/RH.', 403); const items = (await db.list<EduParticipant>('edu_participants', { limit: 200 })).items; return json(buildAdminOverview(items, p => pub({ ...(p as EduParticipant), id: p.id }))); }], 'POST /api/edu/admin/review': [async (c) => { const b = rec(c.body), actor = await participant(String(b.token || '')), reviewId = String(b.reviewId || ''), action = String(b.action || ''); if (!actor)
-            return error('Sessão expirada.', 401); if (!ADMIN_ROLES.includes(effectiveRole(actor)))
+            return error('Sessão expirada.', 401); if (!isAdministrationRole(effectiveRole(actor)))
             return error('Acesso restrito à Administração/RH.', 403); if (!reviewId || !['approve', 'needs_revision'].includes(action))
             return error('Revisão inválida.', 400); const items = (await db.list<EduParticipant>('edu_participants', { limit: 200 })).items, target = items.find(x => (x.pendingReviews || []).some(r => r.id === reviewId)); if (!target)
             return error('Resposta pendente não encontrada.', 404); const pending = (target.pendingReviews || []).find(r => r.id === reviewId)!, remaining = (target.pendingReviews || []).filter(r => r.id !== reviewId), sameUnit = remaining.some(r => r.unit === pending.unit), previous = target.unitProgress?.[pending.unit], stamp = now(), canConsolidate = action === 'approve' && !sameUnit && evaluateObjectiveConsolidation(pending.questionStats || []).consolidated, reviewStage = Math.max(0, Math.min(4, Math.floor(Number(previous?.reviewStage ?? 0)))), intervalDays = [1, 3, 7, 14, 30][reviewStage], nextReviewAt = new Date(Date.now() + intervalDays * 86400000).toISOString(), entry = canConsolidate ? { status: 'consolidated', attempts: pending.attempts, correct: pending.correct, errors: pending.errors, questionStats: pending.questionStats || [], reviewStage, reviewCount: previous?.reviewCount || 0, intervalDays, completedAt: stamp, nextReviewAt } : { status: 'practice', attempts: pending.attempts, correct: pending.correct, errors: pending.errors, questionStats: pending.questionStats || [], reviewStage, reviewCount: previous?.reviewCount || 0, intervalDays }, completedUnits = canConsolidate ? Array.from(new Set([...(target.completedUnits || []), pending.unit])) : (target.completedUnits || []).filter(x => x !== pending.unit); await db.update('edu_participants', [{ id: target.id, record: { ...target, pendingReviews: remaining, completedUnits, unitProgress: { ...(target.unitProgress || {}), [pending.unit]: entry }, progress: Math.round(completedUnits.length / 60 * 100), updatedAt: stamp } }]); return json({ ok: true, status: entry.status, completedUnits }); }], 'POST /api/edu/admin/role': [async (c) => { const b = rec(c.body), actor = await participant(String(b.token || '')); if (!actor)
-            return error('Sessão expirada.', 401); const actorRole = effectiveRole(actor); if (!['superadmin', 'admin'].includes(actorRole))
-            return error('Apenas Superadmin ou Admin pode alterar perfis.', 403); const targetId = String(b.participantId || ''), rawRole = String(b.role || ''); if (!targetId || !EDU_ROLES.includes(rawRole as EduRole))
+            return error('Sessão expirada.', 401); const actorRole = effectiveRole(actor); if (!canManageEducationRoles(actorRole))
+            return error('Apenas Superadmin ou Admin pode alterar perfis.', 403); const targetId = String(b.participantId || ''), rawRole = String(b.role || ''); if (!targetId || !isEducationRole(rawRole))
             return error('Perfil inválido.', 400); const nextRole = rawRole as EduRole, [target] = await db.get<EduParticipant>('edu_participants', [targetId]); if (!target)
-            return error('Participante não encontrado.', 404); const targetRole = effectiveRole(target); if (actorRole === 'admin' && (['superadmin', 'admin'].includes(targetRole) || ['superadmin', 'admin'].includes(nextRole)))
-            return error('Admin pode gerenciar apenas RH, Gestor e Colaborador.', 403); if (actorRole === 'superadmin' && targetId === actor.id && nextRole !== 'superadmin')
-            return error('O Superadmin não pode remover o próprio acesso.', 409); await db.update('edu_participants', [{ id: targetId, record: { ...target, role: nextRole, jobRole: ADMIN_ROLES.includes(nextRole) ? 'Administração' : target.jobRole, updatedAt: now() } }]); return json({ participant: pub({ ...target, id: targetId, role: nextRole, jobRole: ADMIN_ROLES.includes(nextRole) ? 'Administração' : target.jobRole }) }); }] };
-type DiagnosticDraftRecord = DiagnosticDraft & {
-    participantId: string;
-};
-const diagnosticDraftTable = (participantId: string) => `edu_diagnostic_draft_${participantId.replace(/[^a-zA-Z0-9_-]/g, '_')}`;
-async function storedDiagnosticDraft(participantId: string) {
-    return (await db.list<DiagnosticDraftRecord>(diagnosticDraftTable(participantId), { limit: 1 })).items[0] || null;
-}
-async function clearStoredDiagnosticDraft(participantId: string) {
-    const draft = await storedDiagnosticDraft(participantId);
-    if (draft)
-        await db.delete(diagnosticDraftTable(participantId), [draft.id]);
-}
+            return error('Participante não encontrado.', 404); const targetRole = effectiveRole(target), decision = educationRoleChangeDecision({ actorRole, targetRole, nextRole, isSelf: targetId === actor.id }); if (decision === 'admin-boundary')
+            return error('Admin pode gerenciar apenas RH, Gestor e Colaborador.', 403); if (decision === 'self-superadmin-demotion')
+            return error('O Superadmin não pode remover o próprio acesso.', 409); await db.update('edu_participants', [{ id: targetId, record: { ...target, role: nextRole, jobRole: educationJobRole(nextRole, target.jobRole), updatedAt: now() } }]); return json({ participant: pub({ ...target, id: targetId, role: nextRole, jobRole: educationJobRole(nextRole, target.jobRole) }) }); }] };
 export const EDUCATION_DRAFT_ROUTES = {
     'POST /api/edu/diagnostic/draft/read': [async (c) => {
             const p = await participant(String(rec(c.body).token || ''));
             if (!p)
                 return error('Sessão expirada.', 401);
-            return json({ draft: sanitizeDiagnosticDraft(await storedDiagnosticDraft(p.id)) });
+            return json({ draft: sanitizeDiagnosticDraft(await readDiagnosticDraft(diagnosticDraftStore, p.id)) });
         }],
     'POST /api/edu/diagnostic/draft/save': [async (c) => {
             const b = rec(c.body), p = await participant(String(b.token || ''));
@@ -191,18 +186,14 @@ export const EDUCATION_DRAFT_ROUTES = {
             const draft = createDiagnosticDraft(b.draft, now());
             if (!draft)
                 return error('Rascunho da sondagem inválido.', 400);
-            const current = await storedDiagnosticDraft(p.id), record: DiagnosticDraftRecord = { ...draft, participantId: p.id };
-            if (current)
-                await db.update(diagnosticDraftTable(p.id), [{ id: current.id, record }]);
-            else
-                await db.add(diagnosticDraftTable(p.id), [record]);
+            await saveDiagnosticDraft(diagnosticDraftStore, p.id, draft);
             return json({ draft });
         }],
     'POST /api/edu/diagnostic/draft/clear': [async (c) => {
             const p = await participant(String(rec(c.body).token || ''));
             if (!p)
                 return error('Sessão expirada.', 401);
-            await clearStoredDiagnosticDraft(p.id);
+            await clearDiagnosticDraft(diagnosticDraftStore, p.id);
             return json({ ok: true });
         }],
 };

@@ -36,9 +36,11 @@ export function sanitizeDiagnosticDraftState(value: unknown): DiagnosticDraftSta
   const { version, skillIndex, level, assigned } = value;
   if (
     version !== 1 ||
+    typeof skillIndex !== 'number' ||
     !Number.isInteger(skillIndex) ||
     skillIndex < 0 ||
     skillIndex > 11 ||
+    typeof level !== 'number' ||
     !Number.isInteger(level) ||
     level < 1 ||
     level > 5 ||
