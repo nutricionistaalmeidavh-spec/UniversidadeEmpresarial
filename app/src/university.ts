@@ -1,6 +1,6 @@
 import { api, auth } from '@appdeploy/client';
 import './university.css';
-import { hydrateQuestionVisuals } from './question-image-loader';
+import { hydrateQuestionVisuals } from './question-image-loader-v2';
 import { hasQuestionVisual } from './question-visual-index';
 import { evaluateLessonAnswer, lessonAccessViewModel, lessonAttemptFeedback, lessonFeedbackViewModel } from './lesson-feedback';
 import { T, AREAS, MATERIAL_SOURCES, sourceRefs, AUDIT_ROWS, CONTENT, CALIBRATION_BANK, LEVEL_GUIDE, selectQuestions } from './curriculum';

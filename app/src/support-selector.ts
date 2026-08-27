@@ -19,10 +19,16 @@ const FALLBACK: Record<string, string> = {
 export function selectSupportExcerpt(input: { material: string; competency: string; level: string; topic: string; maxEssential?: number; maxComplementary?: number }): SupportExcerpt {
   const maxEssential = input.maxEssential ?? 560, maxComplementary = input.maxComplementary ?? 760;
   const lines = String(input.material || '').split(/\r?\n/).map(x => x.trim()).filter(Boolean);
+  // Restringe a busca ao bloco do nível antes de procurar o tema. Isso evita
+  // que uma palavra comum encontre explicação de outro nível/competência.
+  const levelMatch = String(input.level || '').match(/N([1-5])/i);
+  const levelIndex = levelMatch ? lines.findIndex(line => new RegExp('NÍVEL\\s*' + levelMatch[1] + '\\b', 'i').test(line)) : -1;
+  const nextLevelIndex = levelIndex >= 0 ? lines.findIndex((line, index) => index > levelIndex && /NÍVEL\s*[1-5]\b/i.test(line)) : -1;
+  const scopedLines = levelIndex >= 0 ? lines.slice(levelIndex, nextLevelIndex >= 0 ? nextLevelIndex : lines.length) : lines;
   const terms = normalize(input.topic).split(' ').filter(x => x.length >= 4);
-  const start = lines.findIndex(line => terms.some(term => normalize(line).includes(term)));
+  const start = scopedLines.findIndex(line => terms.some(term => normalize(line).includes(term)));
   if (start < 0) return { essential: (FALLBACK[input.competency] || FALLBACK.leitura).slice(0, maxEssential), complementary: '' };
-  const section = lines.slice(start, start + 10);
+  const section = scopedLines.slice(start, start + 10);
   const nextHeading = section.slice(1).findIndex(line => /^\d+\.\s/.test(line));
   const selected = section.slice(0, nextHeading >= 0 ? nextHeading + 1 : section.length);
   const essential = selected.slice(0, 4).join('\n').slice(0, maxEssential);
