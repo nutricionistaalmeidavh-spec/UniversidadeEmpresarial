@@ -5,7 +5,7 @@
 - GitHub (`nutricionistaalmeidavh-spec/UniversidadeEmpresarial`, `main`): fonte versionada do código.
 - AppDeploy (`fluxodre-campo-b2u-clbfo5`): runtime operacional publicado.
 - URL: https://fluxodre-campo-b2u-clbfo5.v2.appdeploy.ai/
-- Snapshot operacional mais recente: `1787871349234` (loader de imagens tolerante a acentos corrompidos no manifesto; QA sem erros).
+- Snapshot operacional mais recente: `1787873491587` (manifesto separado obrigatório e loader tolerante a acentos corrompidos; QA sem erros).
 
 O GitHub e o AppDeploy devem permanecer alinhados. Arquivos locais ficam em `app/`; durante o deploy, os arquivos são enviados para os caminhos equivalentes do snapshot remoto. `training/legacy-lideranca/` é histórico preservado e não deve ser apagado.
 
@@ -72,3 +72,4 @@ O workflow `.github/workflows/university-ci.yml` roda instalação, typecheck cr
 - AppDeploy v95 sincronizado ao Git como overlay cumulativo: snapshot `1787849357585`, estado `ready`; nenhum novo deploy realizado nesta tarefa.
 - Entrega B publicada no AppDeploy: snapshot `1787864687676`, estado `ready`, sem erros de frontend ou backend.
 - Correção do loader de imagens publicada: snapshot `1787871349234`, estado `ready`; QA sem erros de frontend ou rede. O mapeamento agora usa correspondência exata e fallback seguro por palavras para manifestos legados com caracteres acentuados corrompidos.
+- Manifesto visual separado e fallback publicado: snapshot `1787873491587`, estado `ready`; QA sem erros de frontend ou rede. O ZIP pode conter apenas as imagens; a associação pergunta–imagem–apoio é carregada pelo manifesto JSON separado.
