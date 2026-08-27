@@ -1,6 +1,6 @@
 # Universidade Empresarial
 
-Aplicação de aprendizagem corporativa para alfabetização funcional, matemática prática e competências do mundo do trabalho.
+Aplicação de aprendizagem corporativa para comunicação funcional, matemática prática e competências do mundo do trabalho.
 
 ## Estado atual
 

@@ -1,60 +1,157 @@
 # Tests
 
-## Test 1 - Retomar a jornada do colaborador [sanity]
+## Test 1 - Configurar Gemini uma vez e usar o chat [sanity]
+Viewport: desktop (1280x800)
+Covers: GET /api/finance/gemini/status, POST /api/finance/gemini/save, persistência backend por empresa, POST /api/finance/chat, Gemini 3.7 Flash
+Description: Confirma que a API Key é informada uma única vez e reutilizada automaticamente nas sessões seguintes.
+
+Steps:
+1. Abrir Financeiro sem Gemini configurado e informar uma API Key válida
+2. Salvar e abrir Pergunte ao Financeiro
+3. Recarregar a página e abrir Pergunte ao Financeiro novamente
+
+Expected: O Gemini continua configurado após recarregar; não existe campo de senha/desbloqueio e o chat funciona sem pedir novamente a API Key.
+
+## Test 2 - Trocar a API Key salva
 Viewport: mobile (375x667)
-Covers: autenticação, próxima ação, tarefa diária, aula, feedback e progresso
-Description: Confirma que um colaborador recorrente chega à atividade recomendada e recebe um resultado visível.
+Covers: atualização persistente da configuração Gemini, chave não retornada ao frontend
+Description: Verifica que a chave pode ser substituída sem revelar a chave atual.
 
 Steps:
-1. Entrar com a sessão de colaborador disponível
-2. Acionar "Continuar aprendendo" e responder uma questão objetiva
-3. Avançar para a próxima ação e abrir Meu desenvolvimento
+1. Abrir IA / Gemini com uma configuração já existente
+2. Tocar em Trocar API Key e informar uma nova chave válida
+3. Salvar e voltar para IA / Gemini
 
-Expected: A resposta recebe feedback contextual e o progresso mostra o estado confirmado.
+Expected: A tela mostra Gemini conectado, não mostra a chave salva e não solicita senha.
 
-## Test 2 - Pausar e retomar a sondagem
+## Test 3 - Anexar PDF no chat mobile e analisar com Gemini
 Viewport: mobile (375x667)
-Covers: primeiro acesso, rascunho persistente da sondagem e nivelamento
-Description: Confirma que a sondagem acolhedora pode ser interrompida sem perder respostas.
+Covers: layout móvel do Financeiro, header compacto, anexo acima da mensagem, largura útil, PDF/OCR, POST /api/finance/imports, Gemini no chat
+Description: Confirma que o chat móvel usa a composição aprovada e processa o documento antes da análise.
 
 Steps:
-1. Iniciar a sondagem e responder uma questão
-2. Recarregar a página
-3. Retomar a sondagem
+1. Em Pergunte ao Financeiro, confirmar que o topo mostra apenas seta de retorno e ícone de atualizar
+2. Anexar um PDF pela barra fina acima da caixa de texto, selecionar a conta e pedir "Compare este extrato com as obrigações e mostre divergências"
+3. Enviar
 
-Expected: A mesma competência e o próximo item aparecem, sem reiniciar o percurso.
+Expected: O conteúdo usa praticamente toda a largura disponível, o anexo fica acima da mensagem e o Gemini responde com base no PDF processado e nas obrigações estruturadas.
 
-## Test 3 - Tratar respostas objetiva e aberta
+## Test 4 - Gestão não mistura mais o Financeiro
+Viewport: mobile (375x667)
+Covers: Gestão separada do Financeiro, remoção de payablePending da interface Gestão
+Description: Confirma que o indicador genérico A pagar não aparece mais na Gestão.
+
+Steps:
+1. Abrir Gestão / FluxoDRE
+2. Rolar os Indicadores
+3. Conferir os cards disponíveis
+
+Expected: Não existe card Financeiro com A pagar, A receber ou Vencidos; o Financeiro continua acessível separadamente em Meus sistemas.
+
+## Test 5 - Apoio visual da Universidade e fallback sem imagem
+Viewport: mobile (375x667)
+Covers: Universidade, conteúdo obrigatório curto, Parte 1/Parte 2, material opcional, imagens, checkpoint adaptativo, reforço de 3 questões, POST /api/edu/unit com evidências
+Description: Confirma que cada bloco ensina antes de avaliar, separa o conteúdo obrigatório do material completo e mantém o apoio visual quando disponível.
+
+Steps:
+1. Abrir uma aula e confirmar que a Parte 1 mostra explicação curta, exemplo e botão para 3 questões
+2. Abrir Ver material de apoio completo; nas 3 primeiras questões, errar pelo menos 2 na primeira tentativa e depois corrigi-las
+3. Confirmar o reforço rápido de 3 questões, concluí-lo, seguir para a Parte 2 e terminar as 6 questões até o checkpoint
+
+Expected: Parte 1 e Parte 2 têm textos diferentes e curtos; o material completo é opcional; dificuldade nas primeiras 3 ativa explicação alternativa + 3 questões extras sem repetir as centrais; após as 6 aparece checkpoint e o backend salva evidências da primeira tentativa e do reforço.
+
+## Test 6 - Universidade agrupa cinco níveis em três Aprendizados
+Viewport: mobile (375x667)
+Covers: Universidade, Aprendizado 1/2/3, compatibilidade visual com progresso N1-N5 existente, ponto de entrada recomendado
+Description: Confirma que Home, Trilhas e competência mostram uma jornada curta em três etapas enquanto o motor mantém cinco níveis internos.
+
+Steps:
+1. Abrir a Home e conferir Sua jornada com Aprendizado 1, 2 e 3 e a duração curta da próxima atividade
+2. Entrar em Trilhas e progresso e escolher uma competência de Comunicação ou Matemática
+3. Conferir os três cards, abrir o Aprendizado recomendado e retornar
+
+Expected: Home e Trilhas exibem Aprendizado 1 - Fundamentos, Aprendizado 2 - Aplicação e Aprendizado 3 - Autonomia com percentuais; a próxima sessão indica 5–10 minutos ou 3–5 minutos para revisão; N1-N5 não aparecem para o colaborador e o botão recomendado abre o ponto interno correspondente.
+
+## Test 7 - Sondagem rápida termina em até 18 perguntas
+Viewport: mobile (375x667)
+Covers: Universidade, Sondagem rápida V2, progresso por pergunta, pausa/retomada, ponto de partida provisório, POST /api/edu/diagnostic e rascunho V2
+Description: Confirma que a sondagem inicial deixou de percorrer N1-N5 em sequência e usa aproximadamente 15 perguntas, com no máximo três confirmações.
+
+Steps:
+1. Entrar com um colaborador sem sondagem concluída e iniciar a Sondagem rápida
+2. Responder às perguntas e observar o contador de questões; se aparecer Confirmação rápida, continuar
+3. Concluir a sondagem e visualizar o resultado antes de iniciar a jornada
+
+Expected: A interface mostra Questão X de aproximadamente 15 em vez de Competência X de 12; a sondagem termina com no máximo 18 respostas e exibe Comunicação, Matemática e Mundo do Trabalho como ponto de partida sem mostrar N1-N5 ao colaborador.
+
+## Test 8 - Trilhas e progresso integra navegação e desenvolvimento sem estados contraditórios
+Viewport: mobile (375x667)
+Covers: Universidade, Trilhas e progresso, áreas, competências, próxima ação e estados de progresso
+Description: Verifica que a antiga tela Meu desenvolvimento foi removida e que progresso, próxima ação e navegação ficam concentrados em Trilhas e progresso.
+
+Steps:
+1. Abrir Trilhas e progresso e conferir os 3 Aprendizados, o card Continue daqui e as 3 áreas
+2. Abrir uma área e conferir percentual, Aprendizado atual, estado e CTA de cada competência
+3. Voltar à navegação principal e conferir que Meu desenvolvimento não aparece mais
+
+Expected: Trilhas e progresso concentra a visualização de avanço e navegação; competências em correção não aparecem simultaneamente como prontas para começar; o menu não contém Meu desenvolvimento e o destaque de Aprendizado significa recomendado agora, não progresso já realizado.
+
+## Test 9 - Aula permanece idêntica ao sair, atualizar ou voltar depois
+Viewport: mobile (375x667)
+Covers: Universidade, POST /api/edu/attempt/open, /freeze, /respond e POST /api/edu/unit com attemptId
+Description: Confirma que uma LessonAttempt persiste seed e IDs das questões e deixa de depender de Date.now para remontar a aula.
+
+Steps:
+1. Iniciar uma aula e anotar os enunciados da Parte 1
+2. Atualizar a página, entrar novamente na mesma aula e conferir os enunciados
+3. Responder a primeira questão, sair e retornar; depois concluir a unidade
+
+Expected: A mesma tentativa mantém questões e ordem após reload/retorno; a primeira resposta muda o status para em andamento e a conclusão marca a tentativa como concluída sem trocar a composição.
+
+## Test 10 - Tutor prepara aula e o sorteio trava após a primeira resposta
 Viewport: desktop (1280x800)
-Covers: resposta incorreta, correção, resposta aberta e estado pending_review
-Description: Confirma os estados explícitos de correção e avaliação humana.
+Covers: Tutor, POST /api/edu/admin/participant, /admin/attempt/prepare, /freeze, /reroll e LessonAttempt preparada
+Description: Verifica acompanhamento individual, preparação antecipada e proteção backend contra troca de questões depois do início.
 
 Steps:
-1. Responder incorretamente uma questão objetiva e tentar novamente
-2. Responder corretamente e avançar
-3. Enviar uma resposta aberta válida
+1. Entrar como RH/Admin, abrir Tutor, escolher um colaborador e preparar a próxima aula sugerida
+2. Conferir as questões preparadas e usar Sortear outra aula antes de qualquer resposta
+3. Entrar como colaborador, responder a primeira questão; voltar ao Tutor e tentar sortear novamente
 
-Expected: O erro oferece orientação; o acerto confirma avanço; a aberta aparece como "Aguardando correção".
+Expected: O Tutor mostra Aprendizado, nível interno e confiança por competência; a aula preparada aparece para o colaborador com composição congelada; o reroll funciona somente sem respostas e é bloqueado depois da primeira resposta.
 
-## Test 4 - Orientar o RH para pendências
+## Test 11 - Papel usa a mesma aula e não sobrescreve respostas online
 Viewport: desktop (1280x800)
-Covers: autorização por papel, visão geral, fila de revisão e decisão do RH
-Description: Confirma que o RH encontra uma pendência e registra uma decisão acionável.
+Covers: Tutor, impressão da LessonAttempt, POST /api/edu/admin/attempt/paper-response, origem tutor-paper e proteção contra sobrescrita
+Description: Verifica que papel e online usam a mesma composição congelada e que o Tutor só transcreve respostas ainda vazias.
 
 Steps:
-1. Entrar com a sessão autorizada disponível e abrir Administração RH
-2. Abrir um participante com resposta pendente
-3. Aprovar ou solicitar revisão e confirmar a atualização
+1. No Tutor, abrir uma aula preparada e tocar em Imprimir aula; comparar os enunciados com Ver questões preparadas
+2. Em Lançar respostas do papel, preencher duas questões ainda vazias e salvar
+3. Responder uma questão online como colaborador e tentar lançá-la novamente pelo papel
 
-Expected: A fila e o participante refletem a decisão e indicam a próxima ação.
+Expected: A impressão contém exatamente as questões da tentativa; respostas do papel ficam vinculadas à mesma LessonAttempt com origem tutor-paper; questões já respondidas aparecem bloqueadas e o backend rejeita sobrescrita.
 
-## Test 5 - Bloquear acesso sem sessão
-Viewport: desktop (1280x800)
-Covers: proteção de rota e mensagem de autenticação
-Description: Confirma que conteúdo privado não é exibido sem autenticação.
+## Test 12 - Revisão espaçada é curta e prioriza dificuldade e questões ainda não usadas
+Viewport: mobile (375x667)
+Covers: Universidade, reviewQuestionIds/reviewPoolIds/reviewHistoryIds, LessonAttempt mode review e intervalos 1/3/7/14/30 dias
+Description: Verifica que revisão não repete a aula inteira e usa evidências da tentativa anterior para montar 3 a 5 questões.
 
 Steps:
-1. Abrir a Universidade sem uma sessão válida
-2. Tentar acessar conteúdo de aprendizagem
+1. Concluir uma aula errando ao menos uma questão na primeira tentativa
+2. Quando a revisão estiver disponível, abrir Prática diária e iniciar a revisão
+3. Concluir a revisão e verificar a próxima data programada
 
-Expected: A tela de entrada é exibida e nenhum dado privado aparece.
+Expected: A revisão abre como uma tentativa própria com 4 questões; erros anteriores aparecem primeiro quando elegíveis, o sistema roda questões ainda não usadas nas revisões e mantém os intervalos progressivos de 1, 3, 7, 14 e 30 dias.
+
+## Test 13 - Linguagem neutra, layout amplo, apoio inline e imagens sem falso carregamento
+Viewport: desktop (1440x900) e mobile (375x667)
+Covers: Trilhas e progresso, área de capacitação, aula, material de apoio inline, question-assets-549, seleção visual V2
+Description: Confirma a nomenclatura neutra de capacitação, melhor aproveitamento horizontal, Guia MH e comportamento correto das imagens.
+
+Steps:
+1. Abrir Trilhas e progresso e entrar em Capacitação em Comunicação; conferir o hero com Guia MH e os três cards preenchendo a largura disponível
+2. Entrar em Capacitação em Leitura e iniciar uma nova tentativa; conferir que o apoio da questão aparece antes do enunciado, sem card recolhível no fim
+3. Avançar por questões com e sem imagem mapeada
+
+Expected: Não aparece o termo "alfabetização" em títulos ou textos da experiência; a área usa nomenclatura de Capacitação; cards ocupam melhor a largura; questões mapeadas mostram imagem de apoio e questões sem imagem não exibem "Carregando" que desaparece depois.

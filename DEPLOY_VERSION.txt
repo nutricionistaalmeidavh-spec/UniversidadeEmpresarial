@@ -1,0 +1,9 @@
+app_name=Universidade Empresarial
+app_id=fluxodre-campo-b2u-clbfo5
+version=v95
+snapshot=1787849357585
+status=ready
+live_url=https://fluxodre-campo-b2u-clbfo5.v2.appdeploy.ai/
+qa_frontend_errors=0
+qa_network_errors=0
+package_type=commit-overlay
