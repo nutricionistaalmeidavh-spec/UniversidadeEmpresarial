@@ -1,6 +1,7 @@
 import { hasQuestionVisual } from './question-visual-index';
 
 const ZIP_URL = './resources/question-assets-549.zip';
+const MANIFEST_URL = './resources/question-visuals-manifest.json';
 const RANGE_TAIL_SIZE = 128 * 1024;
 const REQUEST_TIMEOUT_MS = 15_000;
 
@@ -13,11 +14,11 @@ const decoder = new TextDecoder();
 let statePromise: Promise<ZipState> | null = null;
 const urlCache = new Map<string, string>();
 
-async function fetchWithTimeout(init?: RequestInit): Promise<Response> {
+async function fetchWithTimeout(url = ZIP_URL, init?: RequestInit): Promise<Response> {
   const controller = new AbortController();
   const timeout = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   try {
-    return await fetch(ZIP_URL, { ...init, signal: controller.signal, cache: 'force-cache' });
+    return await fetch(url, { ...init, signal: controller.signal, cache: 'force-cache' });
   } finally {
     window.clearTimeout(timeout);
   }
@@ -95,6 +96,15 @@ async function readEntry(state: ZipState, entry: ZipEntry): Promise<Uint8Array> 
   return decodeEntry(entry, new Uint8Array(await bodyResponse.arrayBuffer()));
 }
 
+async function readManifest(state: ZipState, manifestEntry?: ZipEntry) {
+  if (manifestEntry) return decoder.decode(await readEntry(state, manifestEntry));
+  // Older AppDeploy snapshots contain the image ZIP but not its manifest.
+  // Keep the manifest as a small standalone resource so the ZIP stays cacheable.
+  const manifestResponse = await fetchWithTimeout(MANIFEST_URL);
+  if (!manifestResponse.ok) throw new Error('Manifesto visual ausente');
+  return await manifestResponse.text();
+}
+
 async function loadState(): Promise<ZipState> {
   if (statePromise) return statePromise;
   statePromise = (async () => {
@@ -117,8 +127,7 @@ async function loadState(): Promise<ZipState> {
       }
       const state: ZipState = { entries: readEntriesFromCentral(central, end.total), visuals: new Map() };
       const manifestEntry = state.entries.get('question-visuals-manifest.json');
-      if (!manifestEntry) throw new Error('Manifesto visual ausente');
-      const manifest = JSON.parse(decoder.decode(await readEntry(state, manifestEntry))) as Array<{ prompt: string; src: string; alt: string }>;
+      const manifest = JSON.parse(await readManifest(state, manifestEntry)) as Array<{ prompt: string; src: string; alt: string }>;
       manifest.forEach((item) => state.visuals.set(normalize(item.prompt), { file: item.src.split('/').pop() || '', alt: item.alt || 'Apoio visual complementar' }));
       return state;
     }
@@ -126,8 +135,7 @@ async function loadState(): Promise<ZipState> {
     const buffer = tail.byteLength > RANGE_TAIL_SIZE ? tail : await (await fetchWithTimeout()).arrayBuffer();
     const state: ZipState = { buffer, entries: entriesFromFullBuffer(buffer), visuals: new Map() };
     const manifestEntry = state.entries.get('question-visuals-manifest.json');
-    if (!manifestEntry) throw new Error('Manifesto visual ausente');
-    const manifest = JSON.parse(decoder.decode(await readEntry(state, manifestEntry))) as Array<{ prompt: string; src: string; alt: string }>;
+    const manifest = JSON.parse(await readManifest(state, manifestEntry)) as Array<{ prompt: string; src: string; alt: string }>;
     manifest.forEach((item) => state.visuals.set(normalize(item.prompt), { file: item.src.split('/').pop() || '', alt: item.alt || 'Apoio visual complementar' }));
     return state;
   })().catch((error) => {
