@@ -25,6 +25,16 @@ async function fetchWithTimeout(url = ZIP_URL, init?: RequestInit): Promise<Resp
   }
 }
 
+async function readManifest(state: ZipState, manifestEntry?: ZipEntry) {
+  if (manifestEntry) return decoder.decode(await readEntry(state, manifestEntry));
+  // The deployed image ZIP intentionally contains only image binaries. The
+  // small JSON manifest is a separate cacheable resource so browsers do not
+  // download or parse the whole archive just to discover a mapping.
+  const response = await fetchWithTimeout(MANIFEST_URL);
+  if (!response.ok) throw new Error('Manifesto visual ausente');
+  return response.text();
+}
+
 function registerEntry(entries: Map<string, ZipEntry>, entry: ZipEntry) {
   entries.set(entry.name, entry);
   const basename = entry.name.split('/').pop();
@@ -95,15 +105,6 @@ async function readEntry(state: ZipState, entry: ZipEntry): Promise<Uint8Array> 
   const bodyResponse = await fetchWithTimeout({ headers: { Range: `bytes=${start}-${start + entry.compressedSize - 1}` } });
   if (!bodyResponse.ok) throw new Error('Falha ao carregar imagem de apoio');
   return decodeEntry(entry, new Uint8Array(await bodyResponse.arrayBuffer()));
-}
-
-async function readManifest(state: ZipState, manifestEntry?: ZipEntry) {
-  if (manifestEntry) return decoder.decode(await readEntry(state, manifestEntry));
-  // Older AppDeploy snapshots contain the image ZIP but not its manifest.
-  // Keep the manifest as a small standalone resource so the ZIP stays cacheable.
-  const manifestResponse = await fetchWithTimeout(MANIFEST_URL);
-  if (!manifestResponse.ok) throw new Error('Manifesto visual ausente');
-  return await manifestResponse.text();
 }
 
 async function loadState(): Promise<ZipState> {
