@@ -1,0 +1,137 @@
+{
+  "package": "UniversidadeEmpresarial_AppDeploy_v95_commit",
+  "appdeploy_version": "v95",
+  "snapshot": "1787849357585",
+  "files": [
+    {
+      "path": "DEPLOY_VERSION.txt",
+      "bytes": 244,
+      "sha256": "9a02d72fa534e5bdad85b022d6116721a75fff5288ce1b3025510dc3c2b7af9e"
+    },
+    {
+      "path": "INTEGRACAO_V95.md",
+      "bytes": 2713,
+      "sha256": "185816dfbf8f20e9818b42ccb89d7a7726d1ca20a70ffde497c16f2da84f419a"
+    },
+    {
+      "path": "README_COMMIT.md",
+      "bytes": 1358,
+      "sha256": "d7388c61c7fbdf2b72863604fb7419fe33a297ccc63dcca3249505204f96ea69"
+    },
+    {
+      "path": "app/backend/continuous-leveling.ts",
+      "bytes": 2864,
+      "sha256": "a27481a854d9457be28f7c33572875cbc7205f8a8dd12a2468a1215fb1f4ddc3"
+    },
+    {
+      "path": "app/backend/diagnostic-draft-store.ts",
+      "bytes": 1686,
+      "sha256": "17818b0bdfe0246f8337b5e42cda07d6d36e743d08dcca0584baf23df853379b"
+    },
+    {
+      "path": "app/backend/diagnostic-draft.ts",
+      "bytes": 3951,
+      "sha256": "ab9514905f325bed99c73ea4a86bebdee5af072d25db18fccc87d3bfcb11f8ad"
+    },
+    {
+      "path": "app/backend/lesson-attempt.ts",
+      "bytes": 5969,
+      "sha256": "8802672d55f5ac990acd66f1417f3562be07b364cbd3140704aaf76174815730"
+    },
+    {
+      "path": "app/backend/spaced-review.ts",
+      "bytes": 860,
+      "sha256": "fd0bcfb0b114dc60fb83e594c923bc5f9a2e814050d73d64821a7b3db895f908"
+    },
+    {
+      "path": "app/backend/unit-policy.ts",
+      "bytes": 654,
+      "sha256": "5f958fc885dbaa4dd599e7ae8eafb4537a99bd12c94599b71c3a1fcb31ee8c31"
+    },
+    {
+      "path": "app/package.json",
+      "bytes": 1206,
+      "sha256": "96ffd4bd8f70556557d6cd449a62bcb8bbf4c0048efccd843e0cf0040a93e692"
+    },
+    {
+      "path": "app/public/resources/question-assets-549.zip",
+      "bytes": 16770322,
+      "sha256": "2f6910a96d79ecfebc93c5cfbb95c4a7e3f830674f13be3abbe07afc89655187"
+    },
+    {
+      "path": "app/src/diagnostic-bank.ts",
+      "bytes": 6993,
+      "sha256": "16b78226208f02bae03af0cc8aa737e3820a54e463db1722c34a6e305d8b3e5a"
+    },
+    {
+      "path": "app/src/diagnostic-flow.ts",
+      "bytes": 5798,
+      "sha256": "ce86827d9aae14efde8090ea5834f088993f376954762843a0ffc878c0dce8c7"
+    },
+    {
+      "path": "app/src/journey-view.ts",
+      "bytes": 1400,
+      "sha256": "cdfd0eb6073339c9397ee42dd0eb81295bae8fffef9d26f54bbaf047de3f0f96"
+    },
+    {
+      "path": "app/src/learning-stages.ts",
+      "bytes": 2050,
+      "sha256": "c493f030fda876915b0ee6508063743c13a5ab5b906ed6b6cf4d8bbef43ca17d"
+    },
+    {
+      "path": "app/src/lesson-adaptation.ts",
+      "bytes": 2231,
+      "sha256": "b612febc5e6e10a4ce5f5f245e05bfd360a3fc410335d5596313fb2eb7599dd1"
+    },
+    {
+      "path": "app/src/lesson-composition.ts",
+      "bytes": 2579,
+      "sha256": "bb8ea15abd1cdee78cdc442e637cc3450892af7372937f16c7a8d24c68bd296d"
+    },
+    {
+      "path": "app/src/lesson-feedback.ts",
+      "bytes": 3180,
+      "sha256": "3b0961f6d010208b61126b136cd188b973c0aa9c4dc45e862343883d3da8a2f6"
+    },
+    {
+      "path": "app/src/lesson-teaching.ts",
+      "bytes": 7910,
+      "sha256": "a11eccc31f0aba9634207b11af8802747d1c63ee607dccb04c4bc81009aa6a79"
+    },
+    {
+      "path": "app/src/navigation-model.ts",
+      "bytes": 713,
+      "sha256": "14a9f4a5314a496b2d7951c7c8ccfc2a7642ce3fcfef53200ab03e6ab14159af"
+    },
+    {
+      "path": "app/src/question-image-loader.ts",
+      "bytes": 4062,
+      "sha256": "9ef972c3468d338deb3ec0edba6982446d360193bbc5fe2a9c41da6b0e1cddb2"
+    },
+    {
+      "path": "app/src/question-metadata.ts",
+      "bytes": 2756,
+      "sha256": "4cea18cccd4717a639c01fa35ddea7f06a47cf5629c892ac168d46544c39145f"
+    },
+    {
+      "path": "app/src/question-visual-index.ts",
+      "bytes": 6285,
+      "sha256": "a84fd1de5ace6123f16f011f59b3e680e2ae7994495d5ef132cd9df2236b1f76"
+    },
+    {
+      "path": "app/src/support-selector.ts",
+      "bytes": 2636,
+      "sha256": "eef2525ca55697375b20128d185431e13d7db795e889daae9277fa1b51d1a870"
+    },
+    {
+      "path": "app/src/tutor-model.ts",
+      "bytes": 1163,
+      "sha256": "b36f9a33bbea2f71268d8011c3b248e180810f217738d196efd2b340e3da09f3"
+    },
+    {
+      "path": "app/tests/tests.txt",
+      "bytes": 10888,
+      "sha256": "8fa3544f6666501f2eceef1e330a2944ad3dc6a743a1deeab4cd4742ceac9004"
+    }
+  ]
+}

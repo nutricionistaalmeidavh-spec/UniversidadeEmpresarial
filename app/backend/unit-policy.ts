@@ -1,22 +1,21 @@
 export type ObjectiveStat = { attempts: number; errors: number };
 
 export type ConsolidationResult = {
-  totalItems: 3;
+  totalItems: number;
   correctItems: number;
   consolidated: boolean;
 };
 
-/**
- * Server-side rule for objective units: exactly three objective items must be
- * present and each one must have at least one attempt with zero errors.
- * Frontend totals are deliberately ignored.
- */
-export function evaluateObjectiveConsolidation(stats: ObjectiveStat[]): ConsolidationResult {
-  const items = stats.slice(0, 3);
-  const correctItems = items.filter((item) => item.attempts >= 1 && item.errors === 0).length;
+export function evaluateObjectiveConsolidation(
+  stats: ObjectiveStat[],
+  expectedItems = 3,
+): ConsolidationResult {
+  const expected = Math.max(1, Math.min(20, Math.floor(expectedItems)));
+  const items = stats.slice(0, expected);
+  const correctItems = items.filter((item) => item.attempts >= 1 && item.attempts > item.errors).length;
   return {
-    totalItems: 3,
+    totalItems: expected,
     correctItems,
-    consolidated: items.length === 3 && correctItems === 3,
+    consolidated: items.length === expected && correctItems === expected,
   };
 }

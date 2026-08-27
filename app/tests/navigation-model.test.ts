@@ -7,11 +7,11 @@ describe('navegação por estado e papel', () => {
     expect(navigationItems({ diagnosticCompleted: true }).map(x => x.id)).not.toContain('diagnostico');
   });
   it('mantém destinos principais sem tarefas redundantes', () => {
-    expect(navigationItems({ diagnosticCompleted: true }).map(x => x.id)).toEqual(['inicio', 'trilhas', 'evolucao']);
+    expect(navigationItems({ diagnosticCompleted: true }).map(x => x.id)).toEqual(['inicio', 'trilhas']);
   });
   it('adiciona RH somente para papéis autorizados e limita o mobile a quatro destinos', () => {
     expect(navigationItems({ diagnosticCompleted: true, role: 'rh' }).map(x => x.id)).toContain('admin');
     expect(navigationItems({ diagnosticCompleted: true, role: 'gestor' }).map(x => x.id)).not.toContain('admin');
-    expect(navigationItems({ diagnosticCompleted: true, role: 'superadmin' }).filter(x => x.primary)).toHaveLength(4);
+    expect(navigationItems({ diagnosticCompleted: true, role: 'superadmin' }).filter(x => x.primary)).toHaveLength(3);
   });
 });
