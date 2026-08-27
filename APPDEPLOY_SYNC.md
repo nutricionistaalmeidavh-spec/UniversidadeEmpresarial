@@ -5,7 +5,7 @@
 - GitHub (`nutricionistaalmeidavh-spec/UniversidadeEmpresarial`, `main`): fonte versionada do código.
 - AppDeploy (`fluxodre-campo-b2u-clbfo5`): runtime operacional publicado.
 - URL: https://fluxodre-campo-b2u-clbfo5.v2.appdeploy.ai/
-- Snapshot operacional mais recente: `1787864687676` (Entregas B; imagens e material corrigidos).
+- Snapshot operacional mais recente: `1787865921898` (carregamento de imagens sob demanda; Entrega B preservada).
 
 O GitHub e o AppDeploy devem permanecer alinhados. Arquivos locais ficam em `app/`; durante o deploy, os arquivos são enviados para os caminhos equivalentes do snapshot remoto. `training/legacy-lideranca/` é histórico preservado e não deve ser apagado.
 
@@ -71,3 +71,4 @@ O workflow `.github/workflows/university-ci.yml` roda instalação, typecheck cr
 - Hardening/manutenção v1 publicada após merge no Git e CI verde: snapshot `1787767608561`, estado `ready`, sem erros de frontend, backend ou rede na verificação de 2026-08-26.
 - AppDeploy v95 sincronizado ao Git como overlay cumulativo: snapshot `1787849357585`, estado `ready`; nenhum novo deploy realizado nesta tarefa.
 - Entrega B publicada no AppDeploy: snapshot `1787864687676`, estado `ready`, sem erros de frontend ou backend.
+- Otimização do carregamento visual publicada: snapshot `1787865921898`, estado `ready`, sem erros de frontend, backend ou rede.
