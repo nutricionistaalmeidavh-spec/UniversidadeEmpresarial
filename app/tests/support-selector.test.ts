@@ -13,3 +13,9 @@ describe('material de apoio por microtema', () => {
     expect(selectSupportExcerpt({ material: 'outro assunto', competency: 'divisao', level: 'N1', topic: 'repartição' }).essential).toContain('grupos iguais');
   });
 });
+
+it('mantém o apoio dentro do bloco do nível solicitado', () => {
+  const material = 'NÍVEL 1 — FUNDAMENTOS\n\nLETRAS\nReconheça letras.\n\nNÍVEL 2 — LEITURA FUNCIONAL\n\nAVISOS\nLeia avisos do trabalho.';
+  expect(selectSupportExcerpt({ material, competency: 'leitura', level: 'N2', topic: 'AVISOS' }).essential).toContain('AVISOS');
+  expect(selectSupportExcerpt({ material, competency: 'leitura', level: 'N2', topic: 'LETRAS' }).essential).toContain('Leia uma informação');
+});
