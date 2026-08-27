@@ -10,6 +10,7 @@ type Visual = { file: string; alt: string };
 type ZipState = { entries: Map<string, ZipEntry>; visuals: Map<string, Visual>; buffer?: ArrayBuffer };
 
 const normalize = (value: string) => value.normalize('NFKC').trim().toLocaleLowerCase('pt-BR').replace(/\s+/g, ' ');
+const fuzzyWords = (value: string) => normalize(value).normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/[^\p{L}\p{N}]+/gu, ' ').trim().split(/\s+/).filter(Boolean);
 const decoder = new TextDecoder();
 let statePromise: Promise<ZipState> | null = null;
 const urlCache = new Map<string, string>();
@@ -145,6 +146,25 @@ async function loadState(): Promise<ZipState> {
   return statePromise;
 }
 
+function visualForPrompt(state: ZipState, prompt: string): Visual | undefined {
+  const exact = state.visuals.get(normalize(prompt));
+  if (exact) return exact;
+  // Some legacy manifests contain replacement characters where accents were
+  // decoded incorrectly (e.g. 'haver�' vs. 'haverá'). Match only when nearly
+  // every word agrees, accepting a prefix for the damaged word.
+  const target = fuzzyWords(prompt);
+  let best: Visual | undefined;
+  let bestScore = 0;
+  state.visuals.forEach((visual, manifestPrompt) => {
+    const words = fuzzyWords(manifestPrompt);
+    if (Math.abs(words.length - target.length) > 1) return;
+    const matched = target.filter((word) => words.some((candidate) => candidate === word || (word.length >= 4 && candidate.length >= 4 && (word.startsWith(candidate) || candidate.startsWith(word))))).length;
+    const score = matched / Math.max(target.length, words.length);
+    if (score > bestScore) { bestScore = score; best = visual; }
+  });
+  return bestScore >= 0.9 ? best : undefined;
+}
+
 function setUnavailable(node: HTMLElement, retry: () => void) {
   node.innerHTML = '<button type="button" class="edu-question-visual-unavailable">Imagem indisponível. Tentar novamente</button>';
   node.querySelector('button')?.addEventListener('click', retry, { once: true });
@@ -161,7 +181,7 @@ export async function hydrateQuestionVisuals(root: ParentNode = document) {
     await Promise.all(mapped.map(async (node) => {
       const retry = () => { statePromise = null; void hydrateQuestionVisuals(node.parentElement || document); };
       try {
-        const visual = state.visuals.get(normalize(node.dataset.questionPrompt || ''));
+        const visual = visualForPrompt(state, node.dataset.questionPrompt || '');
         if (!visual) return setUnavailable(node, retry);
         let url = urlCache.get(visual.file);
         if (!url) {
